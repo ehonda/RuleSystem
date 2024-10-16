@@ -53,6 +53,14 @@ theorem false_of_isPositive_of_isNegative
 
 def Capture {n : ℕ} (rules : Rules n) := {inst : Instance n // applyTo rules inst}
 
+-- TODO: ⏺ Proof this
+instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules) := by
+  sorry
+
+-- failed to synthesize
+--   DecidablePred fun inst ↦ applyTo rules inst
+def capture {n : ℕ} (rules : Rules n) : Finset (Instance n) := {inst | applyTo rules inst}
+
 -- n : ℕ
 -- rule : Negative n
 -- inst : Instance n
@@ -212,6 +220,8 @@ theorem singleton_toPositive_capture_eq
 --    applyTo [P0 {A}, P1 {B}, P2 {D}, P3 {E}] (I1 {C, D}) = appliesTo (P2 {D}) (I1 {C, D}) = True (Since {D} ⊆ {C, D})
 --    applyTo [P0 {A}, P1 {B}, P2 {D}, P3 {E}] (I2 {B}) = appliesTo (P1 {B}) (I2 {B}) = True (Since {B} ⊆ {B})
 --    -> Capture [P0 {A}, P1 {B}, P2 {D}, P3 {E}] = [I0 {A}, I1 {C, D}, I2 {B}] ⊇ [I0 {A}, I2 {B}] = Capture {N {C}}
+--
+-- TODO: ⏺ Proof this
 theorem singleton_toPositive_capture_sub
     {n : ℕ}
     (rule : Negative n)
@@ -220,9 +230,9 @@ theorem singleton_toPositive_capture_sub
     -- TODO: Required?
     (h_inst : inst.tags.Nonempty)
     -- TODO: There's got to be a better way to go from `Finset (Positive n)` (`toPositive rule`) to
-    --       `Finset (Rule n) = Rules n` (which is what `Capture` expects)
+    --       `Finset (Rule n) = Rules n` (which is what `capture` expects)
   -- TODO: We can't use ⊆ here, what do we use instead?
-  : Capture {rule.val} ⊆ Capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
+  : capture {rule.val} ⊆ capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
     sorry
 
 end Rule
