@@ -3,7 +3,7 @@ import Mathlib.Data.Fintype.Basic
 import RuleSystem.Rules.Defs
 
 structure Instance (n : ℕ) where
-  (tags : Tags n)
+  tags : Tags n
 
 namespace Instance
 

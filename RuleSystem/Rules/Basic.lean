@@ -3,11 +3,11 @@ import RuleSystem.Rules.Defs
 import RuleSystem.Rules.Instance
 import Mathlib.Data.Fintype.Basic
 
-namespace Rule
-
 inductive Rule (n : ℕ) where
   | positive (tags : Tags n)
   | negative (tags : Tags n)
+
+namespace Rule
 
 abbrev Rules (n : ℕ) := Finset (Rule n)
 
@@ -61,24 +61,17 @@ instance decidableAppliesTo {n : ℕ} (rule : Rule n) (inst : Instance n) : Deci
       | isTrue h => isFalse (Finset.Nonempty.ne_empty h)
       | isFalse h => isTrue (Finset.not_nonempty_iff_eq_empty.mp h)
 
--- TODO: ⏺ Proof `appliesTo` is decidable first
 instance decidablePredAppliesTo {n : ℕ} (rule : Rule n) : DecidablePred (appliesTo rule)
   := λ inst ↦ decidableAppliesTo rule inst
 
--- TODO: ⏺ Proof this
--- instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
---   := λ inst ↦
---     let decidablePred : Decidable (applyTo rules inst) :=
---       let isFalse : (¬ applyTo rules inst) ↦ Decidable (applyTo rules inst) := sorry
---       let isTrue : applyTo rules inst ↦ Decidable (applyTo rules inst) := sorry
---       ⟨isFalse, isTrue⟩
---     decidablePred
+-- TODO: This looks like a prime candidate for type class inference (if used correctly?)
+instance decidableApplyTo {n : ℕ} (rules : Rules n) (inst : Instance n) : Decidable (applyTo rules inst) :=
+  match @Finset.decidableExistsAndFinset _ rules (appliesTo · inst) _ with
+    | isTrue h => isTrue h
+    | isFalse h => isFalse h
 
--- TODO: ⏺ Proof `appliesTo` is decidable first
 instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
-  := λ inst ↦ by
-    simp [applyTo, appliesTo]
-    sorry
+  := λ inst ↦ decidableApplyTo rules inst
 
 -- failed to synthesize
 --   DecidablePred fun inst ↦ applyTo rules inst
