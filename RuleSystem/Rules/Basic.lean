@@ -53,9 +53,32 @@ theorem false_of_isPositive_of_isNegative
 
 def Capture {n : ℕ} (rules : Rules n) := {inst : Instance n // applyTo rules inst}
 
+-- TODO: Use type class inference to construct some of this, i.e. `inferInstance` and the like
+instance decidableAppliesTo {n : ℕ} (rule : Rule n) (inst : Instance n) : Decidable (appliesTo rule inst)
+  := match rule with
+    | .positive tags => Finset.instDecidableRelSubset tags inst.tags
+    | .negative tags => match @Finset.decidableNonempty _ (tags ∩ inst.tags) with
+      | isTrue h => isFalse (Finset.Nonempty.ne_empty h)
+      | isFalse h => isTrue (Finset.not_nonempty_iff_eq_empty.mp h)
+
+-- TODO: ⏺ Proof `appliesTo` is decidable first
+instance decidablePredAppliesTo {n : ℕ} (rule : Rule n) : DecidablePred (appliesTo rule)
+  := λ inst ↦ decidableAppliesTo rule inst
+
 -- TODO: ⏺ Proof this
-instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules) := by
-  sorry
+-- instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
+--   := λ inst ↦
+--     let decidablePred : Decidable (applyTo rules inst) :=
+--       let isFalse : (¬ applyTo rules inst) ↦ Decidable (applyTo rules inst) := sorry
+--       let isTrue : applyTo rules inst ↦ Decidable (applyTo rules inst) := sorry
+--       ⟨isFalse, isTrue⟩
+--     decidablePred
+
+-- TODO: ⏺ Proof `appliesTo` is decidable first
+instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
+  := λ inst ↦ by
+    simp [applyTo, appliesTo]
+    sorry
 
 -- failed to synthesize
 --   DecidablePred fun inst ↦ applyTo rules inst
