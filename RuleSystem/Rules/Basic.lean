@@ -76,7 +76,7 @@ instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (apply
 def capture {n : ℕ} (rules : Rules n) : Finset (Instance n) := {inst | applyTo rules inst}
 
 def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
-  let tags' := Finset.univ \ Rule.tags rule.val
+  let tags' := Finset.univ \ tags rule.val
   let ctor : Tag n → Positive n := λ (tag : Tag n) ↦
     let rule := Rule.positive {tag}
     ⟨rule, by simp only [Rule.IsPositive]⟩
@@ -112,13 +112,21 @@ def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
 theorem singleton_toPositive_capture_sub
     {n : ℕ}
     (rule : Negative n)
-    (inst : Instance n)
-    (h_rule : ∃ tag, rule.val = Rule.negative {tag})
-    -- TODO: Required?
-    (h_inst : inst.tags.Nonempty)
+    (rule_val_eq_negative : ∃ tag, rule.val = Rule.negative {tag})
     -- TODO: There's got to be a better way to go from `Finset (Positive n)` (`toPositive rule`) to
     --       `Finset (Rule n) = Rules n` (which is what `capture` expects)
   : capture {rule.val} ⊆ capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
+    simp [capture, toPositive, applyTo, appliesTo]
+    intro inst inst_mem_capture
+    obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
+    have negative_capture : {tag} ∩ inst.tags = ∅ := by
+      simp [rule_val_eq_negative_singleton_tag ] at inst_mem_capture
+      assumption
+    -- TODO: Now we want to show:
+    --          `⊢ inst ∈ Finset.filter (fun inst ↦ ∃ a ∉ (↑rule).tags, a ∈ inst.tags) Finset.univ`
+    --       In order to do this, the following two must hold:
+    --          1. We need tags different from `tag`, i.e. `n > 1`
+    --          2. We need `inst` to not be tag-less.
     sorry
 
 end Rule
