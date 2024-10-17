@@ -1,6 +1,7 @@
 import RuleSystem.Rules.BigOr
 import RuleSystem.Rules.Defs
 import RuleSystem.Rules.Instance
+import RuleSystem.Rules.Tags
 import Mathlib.Data.Fintype.Basic
 
 inductive Rule (n : ℕ) where
@@ -51,29 +52,45 @@ theorem false_of_isPositive_of_isNegative
     | positive => exact h_neg
     | negative => exact h_pos
 
-def Capture {n : ℕ} (rules : Rules n) := {inst : Instance n // applyTo rules inst}
-
 -- TODO: Use type class inference to construct some of this, i.e. `inferInstance` and the like
-instance decidableAppliesTo {n : ℕ} (rule : Rule n) (inst : Instance n) : Decidable (appliesTo rule inst)
+instance instDecidableAppliesTo {n : ℕ} (rule : Rule n) (inst : Instance n) : Decidable (appliesTo rule inst)
   := match rule with
     | .positive tags => Finset.instDecidableRelSubset tags inst.tags
     | .negative tags => match @Finset.decidableNonempty _ (tags ∩ inst.tags) with
       | isTrue h => isFalse (Finset.Nonempty.ne_empty h)
       | isFalse h => isTrue (Finset.not_nonempty_iff_eq_empty.mp h)
 
-instance decidablePredAppliesTo {n : ℕ} (rule : Rule n) : DecidablePred (appliesTo rule)
-  := decidableAppliesTo rule
+-- TODO: 🚮 We probably don't need this right? It can be inferred easily from the non-pred-version
+-- instance instDecidablePredAppliesTo {n : ℕ} (rule : Rule n) : DecidablePred (appliesTo rule)
+--   := instDecidableAppliesTo rule
 
 -- TODO: This looks like a prime candidate for type class inference (if used correctly?)
-instance decidableApplyTo {n : ℕ} (rules : Rules n) (inst : Instance n) : Decidable (applyTo rules inst) :=
+instance instDecidableApplyTo {n : ℕ} (rules : Rules n) (inst : Instance n) : Decidable (applyTo rules inst) :=
   match @Finset.decidableExistsAndFinset _ rules (appliesTo · inst) _ with
     | isTrue h => isTrue h
     | isFalse h => isFalse h
 
-instance decidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
-  := decidableApplyTo rules
+-- TODO: 🚮 We probably don't need this right? It can be inferred easily from the non-pred-version
+-- instance instDecidablePredApplyTo {n : ℕ} (rules : Rules n) : DecidablePred (applyTo rules)
+--   := instDecidableApplyTo rules
 
 def capture {n : ℕ} (rules : Rules n) : Finset (Instance n) := {inst | applyTo rules inst}
+-- The corresponding subtype
+def Capture {n : ℕ} (rules : Rules n) := Subtype (· ∈ capture rules)
+
+instance instDecidableTagsNonempty {n : ℕ} (inst : Instance n) : Decidable (inst.tags.Nonempty)
+  := Finset.decidableNonempty
+
+instance instDecidableMemCapture {n : ℕ} (rules : Rules n) (inst : Instance n) : Decidable (inst ∈ capture rules)
+  := Finset.decidableMem inst (capture rules)
+
+-- TODO: Better name
+-- TODO: Can we instead define this with `inst : (Capture rules)`? Then we don't need the `DecidablePred` for
+--       `inst ∈ capture rules ∧ inst.tags.Nonempty`
+def captureOnTagged {n : ℕ} (rules : Rules n) : Finset (Instance n)
+  := {inst | inst ∈ capture rules ∧ inst.tags.Nonempty}
+-- The corresponding subtype
+def CaptureOnTagged {n : ℕ} (rules : Rules n) := Subtype (· ∈ captureOnTagged rules)
 
 def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
   let tags' := Finset.univ \ tags rule.val
@@ -111,22 +128,23 @@ def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
 -- TODO: ⏺ Proof this
 theorem singleton_toPositive_capture_sub
     {n : ℕ}
+    (n_gt_1 : n > 1)
     (rule : Negative n)
     (rule_val_eq_negative : ∃ tag, rule.val = Rule.negative {tag})
     -- TODO: There's got to be a better way to go from `Finset (Positive n)` (`toPositive rule`) to
     --       `Finset (Rule n) = Rules n` (which is what `capture` expects)
-  : capture {rule.val} ⊆ capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
-    simp [capture, toPositive, applyTo, appliesTo]
+  : captureOnTagged {rule.val} ⊆ capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
+    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo]
     intro inst inst_mem_capture
     obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
     have negative_capture : {tag} ∩ inst.tags = ∅ := by
-      simp [rule_val_eq_negative_singleton_tag ] at inst_mem_capture
-      assumption
+      simp [rule_val_eq_negative_singleton_tag] at inst_mem_capture
+      exact inst_mem_capture.left
     -- TODO: Now we want to show:
     --          `⊢ inst ∈ Finset.filter (fun inst ↦ ∃ a ∉ (↑rule).tags, a ∈ inst.tags) Finset.univ`
     --       In order to do this, the following two must hold:
     --          1. We need tags different from `tag`, i.e. `n > 1`
-    --          2. We need `inst` to not be tag-less.
+    --          2. We need `inst` to not be tag-less. ✅
     sorry
 
 end Rule
