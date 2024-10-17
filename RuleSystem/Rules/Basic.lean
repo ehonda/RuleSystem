@@ -125,26 +125,41 @@ def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
 --    applyTo [P0 {A}, P1 {B}, P2 {D}, P3 {E}] (I2 {B}) = appliesTo (P1 {B}) (I2 {B}) = True (Since {B} ⊆ {B})
 --    -> Capture [P0 {A}, P1 {B}, P2 {D}, P3 {E}] = [I0 {A}, I1 {C, D}, I2 {B}] ⊇ [I0 {A}, I2 {B}] = Capture {N {C}}
 --
--- TODO: ⏺ Proof this
-theorem singleton_toPositive_capture_sub
+-- Proof idea is as follows:
+--    (I) We take an `inst` in the tagged capture (i.e. `inst.tags` is nonempty) of the negative rule.
+--    (II) We show that there exists a rule in the positive counterparts that captures the same `inst`.
+--      (a) `inst` is covered by a positive counterpart if we can find a tag in `inst.tags` for which such a positive
+--          counterpart rule exists.
+--      (b) We get that from the fact that `inst` tags are nonempty (tagged capture), so we have at least one `tag'` in
+--          `inst.tags` (that must also be different from the negative rule tag, since `inst` is captured by the
+--          negative rule).
+--      (c) Since `tag'` is different from the `tag` used by the negative rule, there exists a positive counterpart rule
+--          with that `tag'`, capturing `inst`.
+--
+-- Note that the "onTagged"-Restriction is necessary, since e.g. `I {}` would be captured by any negative rule, but no
+-- positive counterpart can capture it since it has no tags, and all of our positive counterparts have at least one tag
+-- (We would need a tag-less positive rule to capture it).
+theorem captureOnTagged_singleton_negative_sub_capture_toPositive
     {n : ℕ}
-    (n_gt_1 : n > 1)
     (rule : Negative n)
     (rule_val_eq_negative : ∃ tag, rule.val = Rule.negative {tag})
     -- TODO: There's got to be a better way to go from `Finset (Positive n)` (`toPositive rule`) to
     --       `Finset (Rule n) = Rules n` (which is what `capture` expects)
   : captureOnTagged {rule.val} ⊆ capture ((toPositive rule).map (Function.Embedding.subtype _)) := by
     simp [capture, captureOnTagged, toPositive, applyTo, appliesTo]
-    intro inst inst_mem_capture
+    intro inst inst_mem_captureOnTagged
+    simp [rule_val_eq_negative] at inst_mem_captureOnTagged
     obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
-    have negative_capture : {tag} ∩ inst.tags = ∅ := by
-      simp [rule_val_eq_negative_singleton_tag] at inst_mem_capture
-      exact inst_mem_capture.left
-    -- TODO: Now we want to show:
-    --          `⊢ inst ∈ Finset.filter (fun inst ↦ ∃ a ∉ (↑rule).tags, a ∈ inst.tags) Finset.univ`
-    --       In order to do this, the following two must hold:
-    --          1. We need tags different from `tag`, i.e. `n > 1`
-    --          2. We need `inst` to not be tag-less. ✅
-    sorry
+    simp [rule_val_eq_negative_singleton_tag] at inst_mem_captureOnTagged
+    obtain ⟨negative_capture, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
+    simp [Finset.mem_filter]
+    obtain ⟨tag', tag'_mem_inst_tags⟩ := inst_tags_nonempty
+    exists tag'
+    constructor
+    · intro tag'_mem_rule_tags
+      simp [rule_val_eq_negative_singleton_tag] at tag'_mem_rule_tags
+      have tag'_mem_inter : tag' ∈ {tag} ∩ inst.tags := Finset.mem_inter_of_mem tag'_mem_rule_tags tag'_mem_inst_tags
+      simp [negative_capture] at tag'_mem_inter
+    · assumption
 
 end Rule
