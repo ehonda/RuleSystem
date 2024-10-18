@@ -118,8 +118,7 @@ def captureOnTagged {n : ℕ} (rules : Rules n) : Finset (Instance n)
 def CaptureOnTagged {n : ℕ} (rules : Rules n) := Subtype (· ∈ captureOnTagged rules)
 
 def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
-  -- TODO: Use complement here
-  let tags' := Finset.univ \ tags rule.val
+  let tags' := (tags rule.val)ᶜ
   -- TODO: Use `Positive.fromTagsEmbedding` here
   let ctor := λ (tag : Tag n) ↦ Positive.fromTags {tag}
   let ctor_inj : ctor.Injective := by
@@ -188,5 +187,8 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive
         simp [negative_capture] at tag'_mem_inter
       · assumption
     · assumption
+
+-- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
+-- TODO: Maybe also show when the are equal
 
 end Rule
