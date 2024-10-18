@@ -188,6 +188,36 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive
       · assumption
     · assumption
 
+theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive'
+    {n : ℕ}
+    (rule : Negative n)
+  : captureOnTagged {rule.val} ⊆ captureOnTagged (toPositive rule) := by
+    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
+    intro inst inst_mem_captureOnTagged
+    simp [rule.property] at inst_mem_captureOnTagged
+    -- obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
+    obtain ⟨rule_def, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
+    -- TODO: `cases rule.val with ...`
+    obtain ⟨rule, rule_isNegative⟩ := rule
+    simp [rule_isNegative] at rule_def
+    sorry
+    -- cases rule with
+    --   -- | positive tags => exact False.elim (false_of_isPositive_of_isNegative _ _)
+    --   | _ =>
+    --     simp [rule_val_eq_negative_singleton_tag] at inst_mem_captureOnTagged
+    --     obtain ⟨negative_capture, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
+    --     simp [Finset.mem_filter]
+    --     constructor
+    --     · obtain ⟨tag', tag'_mem_inst_tags⟩ := inst_tags_nonempty
+    --       exists tag'
+    --       constructor
+    --       · intro tag'_mem_rule_tags
+    --         simp [rule_val_eq_negative_singleton_tag] at tag'_mem_rule_tags
+    --         have tag'_mem_inter : tag' ∈ {tag} ∩ inst.tags := Finset.mem_inter_of_mem tag'_mem_rule_tags tag'_mem_inst_tags
+    --         simp [negative_capture] at tag'_mem_inter
+    --       · assumption
+    --     · assumption
+
 -- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
 -- TODO: Maybe also show when the are equal
 
