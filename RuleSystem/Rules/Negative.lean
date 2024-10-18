@@ -16,7 +16,7 @@ def Negative (n : ℕ) := Subtype (@IsNegative n)
 
 namespace Negative
 
-def fromTags {n : ℕ} (tags : Tags n) : Negative n := ⟨Rule.negative tags, by simp only [Rule.IsNegative]⟩
+def fromTags {n : ℕ} (tags : Tags n) : Negative n := ⟨negative tags, by simp only [IsNegative]⟩
 
 def fromTagsEmbedding {n : ℕ} : Tags n ↪ Negative n :=
   let fromTags_inj : fromTags.Injective := by
@@ -25,6 +25,18 @@ def fromTagsEmbedding {n : ℕ} : Tags n ↪ Negative n :=
     simp only [fromTags, negative.injEq] at this
     assumption
   ⟨fromTags, fromTags_inj⟩
+
+def fromTag {n : ℕ} (tag : Tag n) := fromTags {tag}
+
+def fromTagEmbedding {n : ℕ} : Tag n ↪ Negative n :=
+  -- TODO: Find a nicer way to prove this
+  let fromTag_inj : fromTag.Injective := by
+    intro t t' subtype_eq
+    have := Subtype.eq_iff.mp subtype_eq
+    simp only [fromTag, negative.injEq] at this
+    have := fromTagsEmbedding.inj' (Subtype.eq this)
+    exact Finset.singleton_inj.mp this
+  ⟨fromTag, fromTag_inj⟩
 
 end Negative
 

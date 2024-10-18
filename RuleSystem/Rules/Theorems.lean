@@ -12,6 +12,12 @@ theorem false_of_isPositive_of_isNegative
     | positive => exact h_neg
     | negative => exact h_pos
 
+-- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
+-- TODO: Maybe also show when the are equal
+
+-- TODO: Better name
+-- theorem captureOnTagged_positive_sub_captureOnTagged_split
+
 -- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
 -- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative
 -- rule. Example:
@@ -55,7 +61,7 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : 
       | positive tags =>
         exact False.elim (false_of_isPositive_of_isNegative (isPositive_of_eq_positive rule_val_eq) rule.property)
       | negative tags =>
-        simp [capture, captureOnTagged, Negative.toPositives, applyTo, appliesTo, Positive.fromTags]
+        simp [capture, captureOnTagged, Negative.toPositives, applyTo, appliesTo, Positive.fromTagEmbedding]
         intro inst inst_mem_captureOnTagged
         simp [rule.property] at inst_mem_captureOnTagged
         simp [rule_val_eq] at *
@@ -66,10 +72,9 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : 
           · intro tag_mem_rule_tags
             have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
             simp [inst_mem_captureOnTagged.left] at tag_mem_inter
-          · assumption
+          -- TODO: Fix this!
+          · simp [tag_mem_inst_tags, Positive.fromTag]
+            assumption
         · exact inst_mem_captureOnTagged.right
-
--- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
--- TODO: Maybe also show when the are equal
 
 end Rule
