@@ -195,28 +195,22 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive'
     simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
     intro inst inst_mem_captureOnTagged
     simp [rule.property] at inst_mem_captureOnTagged
-    -- obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
-    obtain ⟨rule_def, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
-    -- TODO: `cases rule.val with ...`
-    obtain ⟨rule, rule_isNegative⟩ := rule
-    simp [rule_isNegative] at rule_def
-    sorry
-    -- cases rule with
-    --   -- | positive tags => exact False.elim (false_of_isPositive_of_isNegative _ _)
-    --   | _ =>
-    --     simp [rule_val_eq_negative_singleton_tag] at inst_mem_captureOnTagged
-    --     obtain ⟨negative_capture, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
-    --     simp [Finset.mem_filter]
-    --     constructor
-    --     · obtain ⟨tag', tag'_mem_inst_tags⟩ := inst_tags_nonempty
-    --       exists tag'
-    --       constructor
-    --       · intro tag'_mem_rule_tags
-    --         simp [rule_val_eq_negative_singleton_tag] at tag'_mem_rule_tags
-    --         have tag'_mem_inter : tag' ∈ {tag} ∩ inst.tags := Finset.mem_inter_of_mem tag'_mem_rule_tags tag'_mem_inst_tags
-    --         simp [negative_capture] at tag'_mem_inter
-    --       · assumption
-    --     · assumption
+    -- TODO: Maybe do the cases at the start already
+    cases rule_val_eq : rule.val with
+      | positive tags =>
+        have rule_val_isPositive : IsPositive rule.val := by simp [rule_val_eq, IsPositive]
+        exact False.elim (false_of_isPositive_of_isNegative rule_val_isPositive rule.property)
+      | negative tags =>
+        simp [rule_val_eq] at *
+        constructor
+        · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
+          exists tag
+          constructor
+          · intro tag_mem_rule_tags
+            have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
+            simp [inst_mem_captureOnTagged.left] at tag_mem_inter
+          · assumption
+        · exact inst_mem_captureOnTagged.right
 
 -- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
 -- TODO: Maybe also show when the are equal
