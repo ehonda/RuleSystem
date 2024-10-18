@@ -32,6 +32,10 @@ def IsPositive {n : ℕ} (rule : Rule n) : Prop :=
   | .positive _ => True
   | .negative _ => False
 
+theorem isPositive_of_positive {n : ℕ} (tags : Tags n) : IsPositive (positive tags) := by simp [IsPositive]
+theorem isPositive_of_eq_positive {n : ℕ} {tags : Tags n} {rule : Rule n} (h : rule = positive tags)
+  : IsPositive rule := h ▸ isPositive_of_positive _
+
 def Positive (n : ℕ) := Subtype (@IsPositive n)
 
 namespace Positive
@@ -56,6 +60,10 @@ def IsNegative {n : ℕ} (rule : Rule n) : Prop :=
   match rule with
   | .positive _ => False
   | .negative _ => True
+
+theorem isNegative_of_negative {n : ℕ} (tags : Tags n) : IsNegative (negative tags) := by simp [IsNegative]
+theorem isNegative_of_eq_negative {n : ℕ} {tags : Tags n} {rule : Rule n} (h : rule = negative tags)
+  : IsNegative rule := h ▸ isNegative_of_negative _
 
 def Negative (n : ℕ) := Subtype (@IsNegative n)
 
@@ -128,9 +136,9 @@ def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
     assumption
   Finset.map ⟨ctor, ctor_inj⟩ tags'
 
--- What we can show is that for negative rules with exactly one tag, we have a correspondence on the capture between the
--- rule and its positive counterparts, by virtue of the positive rules capturing at least the same instances as the
--- negative rule. Example:
+-- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
+-- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative
+-- rule. Example:
 --
 -- Tag Universe: {A, B, C, D, E}
 -- Negative Rule: N {C}
@@ -161,46 +169,19 @@ def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
 --          with that `tag'`, capturing `inst`.
 --
 -- Note that the "onTagged"-Restriction is necessary, since e.g. `I {}` would be captured by any negative rule, but no
--- positive counterpart can capture it since it has no tags, and all of our positive counterparts have at least one tag
--- (We would need a tag-less positive rule to capture it).
+-- positive counterpart can capture it since it has no tags, and all of our positive counterparts have at exactly one
+-- tag (We would need a tag-less positive rule to capture it).
 -- We prove the stronger `captureOnTagged negative ⊆ captureOnTagged positives` here (from which we also have
 -- `captureOnTagged negative ⊆ capture positives`, as `captureOnTagged positives ⊆ capture positives`).
-theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive
-    {n : ℕ}
-    (rule : Negative n)
-    (rule_val_eq_negative : ∃ tag, rule.val = Rule.negative {tag})
+theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive {n : ℕ} (rule : Negative n)
   : captureOnTagged {rule.val} ⊆ captureOnTagged (toPositive rule) := by
-    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
-    intro inst inst_mem_captureOnTagged
-    simp [rule_val_eq_negative] at inst_mem_captureOnTagged
-    obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
-    simp [rule_val_eq_negative_singleton_tag] at inst_mem_captureOnTagged
-    obtain ⟨negative_capture, inst_tags_nonempty⟩ := inst_mem_captureOnTagged
-    simp [Finset.mem_filter]
-    constructor
-    · obtain ⟨tag', tag'_mem_inst_tags⟩ := inst_tags_nonempty
-      exists tag'
-      constructor
-      · intro tag'_mem_rule_tags
-        simp [rule_val_eq_negative_singleton_tag] at tag'_mem_rule_tags
-        have tag'_mem_inter : tag' ∈ {tag} ∩ inst.tags := Finset.mem_inter_of_mem tag'_mem_rule_tags tag'_mem_inst_tags
-        simp [negative_capture] at tag'_mem_inter
-      · assumption
-    · assumption
-
-theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive'
-    {n : ℕ}
-    (rule : Negative n)
-  : captureOnTagged {rule.val} ⊆ captureOnTagged (toPositive rule) := by
-    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
-    intro inst inst_mem_captureOnTagged
-    simp [rule.property] at inst_mem_captureOnTagged
-    -- TODO: Maybe do the cases at the start already
     cases rule_val_eq : rule.val with
       | positive tags =>
-        have rule_val_isPositive : IsPositive rule.val := by simp [rule_val_eq, IsPositive]
-        exact False.elim (false_of_isPositive_of_isNegative rule_val_isPositive rule.property)
+        exact False.elim (false_of_isPositive_of_isNegative (isPositive_of_eq_positive rule_val_eq) rule.property)
       | negative tags =>
+        simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
+        intro inst inst_mem_captureOnTagged
+        simp [rule.property] at inst_mem_captureOnTagged
         simp [rule_val_eq] at *
         constructor
         · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
