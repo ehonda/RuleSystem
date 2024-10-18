@@ -25,4 +25,7 @@ theorem eq_iff_tags_eq {n : ℕ} (inst inst' : Instance n) : inst = inst' ↔ in
 instance instDecidableEq {n : ℕ} : DecidableEq (Instance n)
   := λ _ _ ↦ decidable_of_iff' _ (eq_iff_tags_eq _ _)
 
+instance instDecidableTagsNonempty {n : ℕ} (inst : Instance n) : Decidable (inst.tags.Nonempty)
+  := Finset.decidableNonempty
+
 end Instance

@@ -1,7 +1,5 @@
-import RuleSystem.Rules.Basic
 import RuleSystem.Rules.Capture
-import RuleSystem.Rules.Negative
-import RuleSystem.Rules.Positive
+import RuleSystem.Rules.Transformation
 
 namespace Rule
 
@@ -13,26 +11,6 @@ theorem false_of_isPositive_of_isNegative
   : False := by cases rule with
     | positive => exact h_neg
     | negative => exact h_pos
-
-
-
-instance instDecidableTagsNonempty {n : ℕ} (inst : Instance n) : Decidable (inst.tags.Nonempty)
-  := Finset.decidableNonempty
-
-
-
-
-
-def toPositives {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
-  let tags' := (tags rule.val)ᶜ
-  -- TODO: Use `Positive.fromTagsEmbedding` here
-  let ctor := λ (tag : Tag n) ↦ Positive.fromTags {tag}
-  let ctor_inj : ctor.Injective := by
-    intro t t' subtype_eq
-    have := Subtype.eq_iff.mp subtype_eq
-    simp only [Positive.fromTags, positive.injEq, Finset.singleton_inj, ctor] at this
-    assumption
-  Finset.map ⟨ctor, ctor_inj⟩ tags'
 
 -- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
 -- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative
@@ -72,12 +50,12 @@ def toPositives {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
 -- We prove the stronger `captureOnTagged negative ⊆ captureOnTagged positives` here (from which we also have
 -- `captureOnTagged negative ⊆ capture positives`, as `captureOnTagged positives ⊆ capture positives`).
 theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : ℕ} (rule : Negative n)
-  : captureOnTagged {rule.val} ⊆ captureOnTagged (toPositives rule) := by
+  : captureOnTagged {rule.val} ⊆ captureOnTagged (Negative.toPositives rule) := by
     cases rule_val_eq : rule.val with
       | positive tags =>
         exact False.elim (false_of_isPositive_of_isNegative (isPositive_of_eq_positive rule_val_eq) rule.property)
       | negative tags =>
-        simp [capture, captureOnTagged, toPositives, applyTo, appliesTo, Positive.fromTags]
+        simp [capture, captureOnTagged, Negative.toPositives, applyTo, appliesTo, Positive.fromTags]
         intro inst inst_mem_captureOnTagged
         simp [rule.property] at inst_mem_captureOnTagged
         simp [rule_val_eq] at *

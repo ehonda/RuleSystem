@@ -1,8 +1,5 @@
 import RuleSystem.Rules.Defs
-import RuleSystem.Rules.Finset
 import RuleSystem.Rules.Instance
-import RuleSystem.Rules.Tags
-import Mathlib.Data.Fintype.Basic
 
 inductive Rule (n : ℕ) where
   | positive (tags : Tags n)

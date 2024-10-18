@@ -1,4 +1,5 @@
 import RuleSystem.Rules.Basic
+import RuleSystem.Rules.Finset
 
 namespace Rule
 
