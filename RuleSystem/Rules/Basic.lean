@@ -1,8 +1,10 @@
-import RuleSystem.Rules.BigOr
 import RuleSystem.Rules.Defs
+import RuleSystem.Rules.Finset
 import RuleSystem.Rules.Instance
 import RuleSystem.Rules.Tags
 import Mathlib.Data.Fintype.Basic
+
+-- TODO: Cleanup file structure
 
 inductive Rule (n : ℕ) where
   | positive (tags : Tags n)
@@ -12,7 +14,6 @@ namespace Rule
 
 abbrev Rules (n : ℕ) := Finset (Rule n)
 
--- TODO: Is there a better way to extract the tags?
 def tags {n : ℕ} (rule : Rule n) : Tags n :=
   match rule with
   | .positive tags => tags
@@ -23,25 +24,57 @@ def appliesTo {n : ℕ} (rule : Rule n) (inst : Instance n) : Prop :=
   | .positive tags => tags ⊆ inst.tags
   | .negative tags => tags ∩ inst.tags = ∅
 
--- TODO: Better name
 def applyTo {n : ℕ} (rules : Rules n) (inst : Instance n) : Prop :=
   ∃ rule ∈ rules, (appliesTo · inst) rule
-
--- TODO: Helpers like `Positive.fromTags` and `Negative.fromTags`, so we can just write `Positive.fromTags tags` etc.
 
 def IsPositive {n : ℕ} (rule : Rule n) : Prop :=
   match rule with
   | .positive _ => True
   | .negative _ => False
 
-def Positive (n : ℕ) := {rule : Rule n // IsPositive rule}
+def Positive (n : ℕ) := Subtype (@IsPositive n)
+
+namespace Positive
+
+def fromTags {n : ℕ} (tags : Tags n) : Positive n := ⟨Rule.positive tags, by simp only [Rule.IsPositive]⟩
+
+def fromTagsEmbedding {n : ℕ} : Tags n ↪ Positive n :=
+  let fromTags_inj : fromTags.Injective := by
+    intro t t' subtype_eq
+    have := Subtype.eq_iff.mp subtype_eq
+    simp only [fromTags, positive.injEq] at this
+    assumption
+  ⟨fromTags, fromTags_inj⟩
+
+end Positive
+
+-- TODO: Why is this not found if we don't explicitly define it here? I.e. the theorem below does not type check without
+--       this
+instance instCoeOutPositiveRules {n : ℕ} : CoeOut (Finset (Positive n)) (Rules n) := Finset.instCoeOutSubtype
 
 def IsNegative {n : ℕ} (rule : Rule n) : Prop :=
   match rule with
   | .positive _ => False
   | .negative _ => True
 
-def Negative (n : ℕ) := {rule : Rule n // IsNegative rule}
+def Negative (n : ℕ) := Subtype (@IsNegative n)
+
+namespace Negative
+
+def fromTags {n : ℕ} (tags : Tags n) : Negative n := ⟨Rule.negative tags, by simp only [Rule.IsNegative]⟩
+
+def fromTagsEmbedding {n : ℕ} : Tags n ↪ Negative n :=
+  let fromTags_inj : fromTags.Injective := by
+    intro t t' subtype_eq
+    have := Subtype.eq_iff.mp subtype_eq
+    simp only [fromTags, negative.injEq] at this
+    assumption
+  ⟨fromTags, fromTags_inj⟩
+
+end Negative
+
+-- TODO: Why is this not found if we don't explicitly define it here?
+instance instCoeOutNegativeRules {n : ℕ} : CoeOut (Finset (Negative n)) (Rules n) := Finset.instCoeOutSubtype
 
 theorem false_of_isPositive_of_isNegative
     {n : ℕ}
@@ -85,14 +118,14 @@ def captureOnTagged {n : ℕ} (rules : Rules n) : Finset (Instance n)
 def CaptureOnTagged {n : ℕ} (rules : Rules n) := Subtype (· ∈ captureOnTagged rules)
 
 def toPositive {n : ℕ} (rule : Negative n) : Finset (Positive n) :=
+  -- TODO: Use complement here
   let tags' := Finset.univ \ tags rule.val
-  let ctor : Tag n → Positive n := λ (tag : Tag n) ↦
-    let rule := Rule.positive {tag}
-    ⟨rule, by simp only [Rule.IsPositive]⟩
+  -- TODO: Use `Positive.fromTagsEmbedding` here
+  let ctor := λ (tag : Tag n) ↦ Positive.fromTags {tag}
   let ctor_inj : ctor.Injective := by
     intro t t' subtype_eq
     have := Subtype.eq_iff.mp subtype_eq
-    simp only [Rule.positive.injEq, Finset.singleton_inj] at this
+    simp only [Positive.fromTags, positive.injEq, Finset.singleton_inj, ctor] at this
     assumption
   Finset.map ⟨ctor, ctor_inj⟩ tags'
 
@@ -137,10 +170,8 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositive
     {n : ℕ}
     (rule : Negative n)
     (rule_val_eq_negative : ∃ tag, rule.val = Rule.negative {tag})
-    -- TODO: There's got to be a better way to go from `Finset (Positive n)` (`toPositive rule`) to
-    --       `Finset (Rule n) = Rules n` (which is what `capture` expects)
-  : captureOnTagged {rule.val} ⊆ captureOnTagged ((toPositive rule).map (Function.Embedding.subtype _)) := by
-    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo]
+  : captureOnTagged {rule.val} ⊆ captureOnTagged (toPositive rule) := by
+    simp [capture, captureOnTagged, toPositive, applyTo, appliesTo, Positive.fromTags]
     intro inst inst_mem_captureOnTagged
     simp [rule_val_eq_negative] at inst_mem_captureOnTagged
     obtain ⟨tag, rule_val_eq_negative_singleton_tag⟩ := rule_val_eq_negative
