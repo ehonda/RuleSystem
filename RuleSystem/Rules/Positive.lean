@@ -12,7 +12,9 @@ theorem isPositive_of_positive {n : ℕ} (tags : Tags n) : IsPositive (positive 
 theorem isPositive_of_eq_positive {n : ℕ} {tags : Tags n} {rule : Rule n} (h : rule = positive tags)
   : IsPositive rule := h ▸ isPositive_of_positive _
 
-def Positive (n : ℕ) := Subtype (@IsPositive n)
+-- @[reducible]
+-- def Positive (n : ℕ) := Subtype (@IsPositive n)
+abbrev Positive (n : ℕ) := Subtype (@IsPositive n)
 
 namespace Positive
 
@@ -37,6 +39,39 @@ def fromTagEmbedding {n : ℕ} : Tag n ↪ Positive n :=
     have := fromTagsEmbedding.inj' (Subtype.eq this)
     exact Finset.singleton_inj.mp this
   ⟨fromTag, fromTag_inj⟩
+
+-- def fromTagEmbedding {n : ℕ} : Tag n ↪ Subtype (@IsPositive n) :=
+--   -- TODO: Find a nicer way to prove this
+--   let fromTag_inj : fromTag.Injective := by
+--     intro t t' subtype_eq
+--     have := Subtype.eq_iff.mp subtype_eq
+--     simp only [fromTag, positive.injEq] at this
+--     have := fromTagsEmbedding.inj' (Subtype.eq this)
+--     exact Finset.singleton_inj.mp this
+--   ⟨fromTag, fromTag_inj⟩
+
+theorem appliesTo_fromTagEmbedding {n : ℕ} {tag : Tag n} {inst : Instance n}
+  : (fromTagEmbedding tag).val.appliesTo inst = (tag ∈ inst.tags) := by
+    simp only [appliesTo, fromTagEmbedding, Function.Embedding.coeFn_mk, fromTag, fromTags, Finset.singleton_subset_iff]
+
+theorem helperA {n : ℕ} {tag : Tag n} {inst : Instance n}
+  : (fromTagEmbedding tag).val.appliesTo inst = (positive {tag}).appliesTo inst := rfl
+
+-- theorem helperB {n : ℕ} {tag : Tag n} {inst : Instance n}
+--   : (positive {tag}).appliesTo inst = (tag ∈ inst.tags) := rfl
+
+theorem helperC {n : ℕ} {tag : Tag n} {inst : Instance n}
+  : (positive {tag}).appliesTo inst = ({tag} ⊆ inst.tags) := rfl
+
+theorem appliesTo_fromTagEmbedding' {n : ℕ} {tag : Tag n} {inst : Instance n}
+  -- : ((fromTagEmbedding : Tag n ↪ Subtype (@IsPositive n)) tag).val.appliesTo inst = ({tag} ⊆ inst.tags) := rfl
+  : (fromTagEmbedding tag).val.appliesTo inst = ({tag} ⊆ inst.tags) := rfl
+
+theorem helperD {n : ℕ} : (Tag n ↪ Positive n) = (Tag n ↪ Subtype (@IsPositive n)) := rfl
+
+-- -- Positive.fromTagEmbedding tag
+-- theorem fromTagEmbedding_eq_positive {n : ℕ} {tag : Tag n} : (fromTagEmbedding tag).val = positive {tag} := by
+--   sorry
 
 end Positive
 

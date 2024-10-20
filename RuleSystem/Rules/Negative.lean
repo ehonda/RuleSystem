@@ -12,7 +12,7 @@ theorem isNegative_of_negative {n : ℕ} (tags : Tags n) : IsNegative (negative 
 theorem isNegative_of_eq_negative {n : ℕ} {tags : Tags n} {rule : Rule n} (h : rule = negative tags)
   : IsNegative rule := h ▸ isNegative_of_negative _
 
-def Negative (n : ℕ) := Subtype (@IsNegative n)
+abbrev Negative (n : ℕ) := Subtype (@IsNegative n)
 
 namespace Negative
 
