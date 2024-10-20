@@ -77,6 +77,6 @@ end Positive
 
 -- TODO: Why is this not found if we don't explicitly define it here? E.g. `captureOnTagged (toPositive rule)` does not
 --       type check without this
-instance instCoeOutPositiveRules {n : ℕ} : CoeOut (Finset (Positive n)) (Rules n) := Finset.instCoeOutSubtype
+-- instance instCoeOutPositiveRules {n : ℕ} : CoeOut (Finset (Positive n)) (Rules n) := Finset.instCoeOutSubtype
 
 end Rule
