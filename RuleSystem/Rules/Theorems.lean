@@ -66,26 +66,6 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : 
         simp [rule.property] at inst_mem_captureOnTagged
         simp [rule_val_eq] at *
         constructor
-
-        -- · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
-        --   exists tag
-        --   constructor
-        --   -- · intro tag_mem_rule_tags
-        --   --   have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
-        --   --   simp [inst_mem_captureOnTagged.left] at tag_mem_inter
-        --   -- -- TODO: Fix this!
-        --   -- ·
-        --   --   have : ((Positive.fromTagEmbedding tag)).val.appliesTo inst = (tags ⊆ inst.tags) := sorry
-        --   --   rw [this]
-        --   --   -- have : match ↑(Positive.fromTagEmbedding tag) with | positive tags => tags ⊆ inst.tags | negative tags => tags ∩ inst.tags = ∅ = tags ⊆ inst.tags := sorry
-        --   --   sorry
-        --   --   -- simp [Positive.fromTag, Positive.fromTags]
-        --   --   -- have : (Positive.fromTagEmbedding tag).val = positive {tag} := sorry
-        --   --   -- rw [this]
-        --   --   -- have : tags ⊆ inst.tags := sorry
-        --   --   -- exact this
-        --   --   -- simp [tag_mem_inst_tags, Positive.fromTag]
-        --   --   -- assumption
         · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
           exists tag
           constructor
@@ -93,11 +73,7 @@ theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : 
             have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
             have inter_eq_empty : tags ∩ inst.tags = ∅ := inst_mem_captureOnTagged.left
             simp [inter_eq_empty] at tag_mem_inter
-          ·
-            -- simp_rw [Positive.fromTagEmbedding_eq_positive]
-            -- simp [Positive.fromTagEmbedding, Positive.fromTag]
-            -- simp_rw [@Positive.appliesTo_fromTagEmbedding n tag inst]
-            rw [@Positive.appliesTo_fromTagEmbedding' n tag inst]
+          · rw [@Positive.appliesTo_fromTagEmbedding' n tag inst]
             simpa
         · exact inst_mem_captureOnTagged.right
 

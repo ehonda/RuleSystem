@@ -1,6 +1,14 @@
 import RuleSystem.Rules.Basic
+import RuleSystem.Rules.Transformation
 
 open Rule
+
+-- def rule := @Positive.fromTag 3 0
+-- def rule := @Positive.fromTag 3 1
+def rule : Rule 3 := (Negative.fromTag 0).val
+def inst : Instance 3 := ⟨{0}⟩
+
+#eval @appliesTo 3 rule inst
 
 -- Some examples. An easier mental model to think about these could be to use the example setup from `Defs.lean`, i.e.
 -- the instances represent servers and we have the following correspondence for our tags:
