@@ -1,5 +1,6 @@
 import RuleSystem.Rules.Basic
 import RuleSystem.Rules.Finset
+import RuleSystem.Rules.Function
 
 namespace Rule
 
@@ -72,6 +73,26 @@ theorem helperD {n : ℕ} : (Tag n ↪ Positive n) = (Tag n ↪ Subtype (@IsPosi
 -- -- Positive.fromTagEmbedding tag
 -- theorem fromTagEmbedding_eq_positive {n : ℕ} {tag : Tag n} : (fromTagEmbedding tag).val = positive {tag} := by
 --   sorry
+
+-- instance instCoeOutPositiveEmbeddingRuleEmbedding {α : Type*} {n : ℕ} : CoeOut (α ↪ Positive n) (α ↪ Rule n) where
+--   coe f :=
+--     let f' : α → Rule n := λ a ↦ f a
+--     let f'_inj : f'.Injective := by
+--       intro a a' h
+--       simp [f'] at h
+--       have := Subtype.val_inj.mp h
+--       exact f.inj' this
+--     ⟨f', f'_inj⟩
+
+-- instance instCoeOutPositiveEmbeddingRuleEmbedding {α : Type*} {n : ℕ} : CoeOut (α ↪ Positive n) (α ↪ Rule n) where
+--   coe f :=
+--     let f' : α → Rule n := λ a ↦ f a
+--     let f'_inj : f'.Injective := by
+--       intro a a' h
+--       simp [f'] at h
+--       have := Subtype.val_inj.mp h
+--       exact f.inj' this
+--     ⟨f', f'_inj⟩
 
 end Positive
 
