@@ -15,6 +15,27 @@ theorem false_of_isPositive_of_isNegative
 -- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
 -- TODO: Maybe also show when the are equal
 
+-- TODO: Naming
+theorem captureOnTagged_positive_split {n : ℕ} (rule : Positive n) (rule_val_tags_nonempty : rule.val.tags.Nonempty)
+  : captureOnTagged {rule.val} ⊆ captureOnTagged (split rule) := by
+    -- TODO: Get rid of this case distinction and get us the `rule_val_eq` directly
+    cases rule_val_eq : rule.val with
+      | negative tags =>
+        exact False.elim (false_of_isPositive_of_isNegative rule.property (isNegative_of_eq_negative rule_val_eq))
+      | positive tags =>
+        simp [captureOnTagged, split]
+        intro inst inst_mem_captureOnTagged
+        simp [capture, applyTo, appliesTo, rule.property] at inst_mem_captureOnTagged
+        simp [capture, applyTo, appliesTo, Positive.fromTagEmbedding, Positive.fromTag, Positive.fromTags]
+        constructor
+        · obtain ⟨tag, tag_mem_rule_tags⟩ := rule_val_tags_nonempty
+          simp [rule_val_eq, Rule.tags] at tag_mem_rule_tags
+          exists tag
+          constructor
+          · assumption
+          · exact Finset.mem_of_subset inst_mem_captureOnTagged.left tag_mem_rule_tags
+        · exact inst_mem_captureOnTagged.right
+
 -- TODO: Better name
 -- theorem captureOnTagged_positive_sub_captureOnTagged_split
 

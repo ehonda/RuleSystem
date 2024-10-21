@@ -94,6 +94,11 @@ theorem helperD {n : ℕ} : (Tag n ↪ Positive n) = (Tag n ↪ Subtype (@IsPosi
 --       exact f.inj' this
 --     ⟨f', f'_inj⟩
 
+-- TODO: Fix this
+-- theorem val_eq_positive {n : ℕ} (rule : Positive n) : rule.val = positive rule.val.tags := by
+--   cases rule with
+--   | positive tags => rfl
+
 end Positive
 
 -- TODO: Why is this not found if we don't explicitly define it here? E.g. `captureOnTagged (toPositive rule)` does not
