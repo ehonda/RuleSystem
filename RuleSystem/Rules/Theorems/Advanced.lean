@@ -1,40 +1,30 @@
 import RuleSystem.Rules.Capture
 import RuleSystem.Rules.Transformation
+import RuleSystem.Rules.Theorems.Basic
 
 namespace Rule
-
-theorem false_of_isPositive_of_isNegative
-    {n : ℕ}
-    {rule : Rule n}
-    (h_pos : IsPositive rule)
-    (h_neg : IsNegative rule)
-  : False := by cases rule with
-    | positive => exact h_neg
-    | negative => exact h_pos
 
 -- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
 -- TODO: Maybe also show when the are equal
 
--- TODO: Naming
-theorem captureOnTagged_positive_split {n : ℕ} (rule : Positive n) (rule_val_tags_nonempty : rule.val.tags.Nonempty)
+theorem captureOnTagged_positive_sub_captureOnTagged_split
+    {n : ℕ}
+    (rule : Positive n)
+    (rule_val_tags_nonempty : rule.val.tags.Nonempty)
   : captureOnTagged {rule.val} ⊆ captureOnTagged (split rule) := by
-    -- TODO: Get rid of this case distinction and get us the `rule_val_eq` directly
-    cases rule_val_eq : rule.val with
-      | negative tags =>
-        exact False.elim (false_of_isPositive_of_isNegative rule.property (isNegative_of_eq_negative rule_val_eq))
-      | positive tags =>
-        simp [captureOnTagged, split]
-        intro inst inst_mem_captureOnTagged
-        simp [capture, applyTo, appliesTo, rule.property] at inst_mem_captureOnTagged
-        simp [capture, applyTo, appliesTo, Positive.fromTagEmbedding, Positive.fromTag, Positive.fromTags]
-        constructor
-        · obtain ⟨tag, tag_mem_rule_tags⟩ := rule_val_tags_nonempty
-          simp [rule_val_eq, Rule.tags] at tag_mem_rule_tags
-          exists tag
-          constructor
-          · assumption
-          · exact Finset.mem_of_subset inst_mem_captureOnTagged.left tag_mem_rule_tags
-        · exact inst_mem_captureOnTagged.right
+    obtain ⟨tags, rule_val_eq⟩ := Positive.exists_val_eq_positive rule
+    simp [captureOnTagged, split]
+    intro inst inst_mem_captureOnTagged
+    simp [capture, applyTo, appliesTo, rule.property, rule_val_eq] at inst_mem_captureOnTagged
+    simp [capture, applyTo, appliesTo, Positive.fromTagEmbedding, Positive.fromTag, Positive.fromTags, rule_val_eq]
+    constructor
+    · obtain ⟨tag, tag_mem_rule_tags⟩ := rule_val_tags_nonempty
+      simp [rule_val_eq, Rule.tags] at tag_mem_rule_tags
+      exists tag
+      constructor
+      · assumption
+      · exact Finset.mem_of_subset inst_mem_captureOnTagged.left tag_mem_rule_tags
+    · exact inst_mem_captureOnTagged.right
 
 -- TODO: Better name
 -- theorem captureOnTagged_positive_sub_captureOnTagged_split
@@ -78,24 +68,21 @@ theorem captureOnTagged_positive_split {n : ℕ} (rule : Positive n) (rule_val_t
 -- `captureOnTagged negative ⊆ capture positives`, as `captureOnTagged positives ⊆ capture positives`).
 theorem captureOnTagged_singleton_negative_sub_captureOnTagged_toPositives {n : ℕ} (rule : Negative n)
   : captureOnTagged {rule.val} ⊆ captureOnTagged (Negative.toPositives rule) := by
-    cases rule_val_eq : rule.val with
-      | positive tags =>
-        exact False.elim (false_of_isPositive_of_isNegative (isPositive_of_eq_positive rule_val_eq) rule.property)
-      | negative tags =>
-        simp [capture, captureOnTagged, Negative.toPositives, applyTo]
-        intro inst inst_mem_captureOnTagged
-        simp [rule.property] at inst_mem_captureOnTagged
-        simp [rule_val_eq] at *
+      obtain ⟨tags, rule_val_eq⟩ := Negative.exists_val_eq_negative rule
+      simp [capture, captureOnTagged, Negative.toPositives, applyTo]
+      intro inst inst_mem_captureOnTagged
+      simp [rule.property] at inst_mem_captureOnTagged
+      simp [rule_val_eq] at *
+      constructor
+      · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
+        exists tag
         constructor
-        · obtain ⟨tag, tag_mem_inst_tags⟩ := inst_mem_captureOnTagged.right
-          exists tag
-          constructor
-          · intro tag_mem_rule_tags
-            have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
-            have inter_eq_empty : tags ∩ inst.tags = ∅ := inst_mem_captureOnTagged.left
-            simp [inter_eq_empty] at tag_mem_inter
-          · rw [@Positive.appliesTo_fromTagEmbedding' n tag inst]
-            simpa
-        · exact inst_mem_captureOnTagged.right
+        · intro tag_mem_rule_tags
+          have tag_mem_inter : tag ∈ tags ∩ inst.tags := Finset.mem_inter_of_mem tag_mem_rule_tags tag_mem_inst_tags
+          have inter_eq_empty : tags ∩ inst.tags = ∅ := inst_mem_captureOnTagged.left
+          simp [inter_eq_empty] at tag_mem_inter
+        · rw [@Positive.appliesTo_fromTagEmbedding n tag inst]
+          simpa
+      · exact inst_mem_captureOnTagged.right
 
 end Rule
