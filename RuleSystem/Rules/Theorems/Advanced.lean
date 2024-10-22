@@ -48,6 +48,17 @@ theorem captureOnTagged_negative_sub_captureOnTagged_split
         exact Finset.subset_empty.mp this
     · exact inst_mem_captureOnTagged.right
 
+-- TODO: Fix this definition and theorem
+-- theorem captureOnTagged_negative_eq_captureOnTagged_castSucc
+--     {n : ℕ}
+--     (rule : Negative n)
+--   : captureOnTagged {rule.val} = captureOnTagged (castSucc rule) := by
+--     obtain ⟨tags, rule_val_eq⟩ := Negative.exists_val_eq_negative rule
+--     simp [captureOnTagged, castSucc]
+--     ext inst
+--     simp [capture, applyTo, appliesTo, Negative.fromTagEmbedding, Negative.fromTag, Negative.fromTags, rule_val_eq]
+--     simp [capture, applyTo, appliesTo, Negative.fromTagEmbedding, Negative.fromTag, Negative.fromTags, rule_val_eq
+
 -- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
 -- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative
 -- rule. Example:
