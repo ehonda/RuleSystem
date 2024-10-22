@@ -5,7 +5,7 @@ import RuleSystem.Rules.Theorems.Basic
 namespace Rule
 
 -- TODO: Show stuff like `captureOnTagged (positive {t, s}) ⊆ captureOnTagged {positive {t}, positive {s}}` etc.
--- TODO: Maybe also show when the are equal
+-- TODO: Maybe also show when they are equal
 
 theorem captureOnTagged_positive_sub_captureOnTagged_split
     {n : ℕ}
@@ -26,8 +26,27 @@ theorem captureOnTagged_positive_sub_captureOnTagged_split
       · exact Finset.mem_of_subset inst_mem_captureOnTagged.left tag_mem_rule_tags
     · exact inst_mem_captureOnTagged.right
 
--- TODO: Better name
--- theorem captureOnTagged_positive_sub_captureOnTagged_split
+theorem captureOnTagged_negative_sub_captureOnTagged_split
+    {n : ℕ}
+    (rule : Negative n)
+    (rule_val_tags_nonempty : rule.val.tags.Nonempty)
+  : captureOnTagged {rule.val} ⊆ captureOnTagged (split rule) := by
+    obtain ⟨tags, rule_val_eq⟩ := Negative.exists_val_eq_negative rule
+    simp [captureOnTagged, split]
+    intro inst inst_mem_captureOnTagged
+    simp [capture, applyTo, appliesTo, rule.property, rule_val_eq] at inst_mem_captureOnTagged
+    simp [capture, applyTo, appliesTo, Negative.fromTagEmbedding, Negative.fromTag, Negative.fromTags, rule_val_eq]
+    constructor
+    · obtain ⟨tag, tag_mem_rule_tags⟩ := rule_val_tags_nonempty
+      simp [rule_val_eq, Rule.tags] at tag_mem_rule_tags
+      exists tag
+      constructor
+      · assumption
+      · have : {tag} ⊆ tags := Finset.singleton_subset_iff.mpr tag_mem_rule_tags
+        have : {tag} ∩ inst.tags ⊆ tags ∩ inst.tags := Finset.inter_subset_inter_right this
+        rw [inst_mem_captureOnTagged.left] at this
+        exact Finset.subset_empty.mp this
+    · exact inst_mem_captureOnTagged.right
 
 -- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
 -- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative
