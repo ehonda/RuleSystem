@@ -37,4 +37,16 @@ instance instDecidableApplyTo {n : ℕ} (rules : Rules n) (inst : Instance n) : 
     | isTrue h => isTrue h
     | isFalse h => isFalse h
 
+def castSucc {n : ℕ} (rule : Rule n) : Rule (n + 1) :=
+  match rule with
+  | .positive tags => .positive (tags.map Fin.castSuccEmb)
+  | .negative tags => .negative (tags.map Fin.castSuccEmb)
+
+def castSuccEmbedding {n : ℕ} : Rule n ↪ Rule (n + 1) :=
+  let castSucc_inj : castSucc.Injective := by
+    simp [Function.Injective, castSucc]
+    intro rule rule' castSucc_eq
+    cases h : rule <;> cases h' : rule' <;> simp [h, h'] at castSucc_eq <;> simp [castSucc_eq]
+  ⟨castSucc, castSucc_inj⟩
+
 end Rule
