@@ -122,12 +122,7 @@ theorem captureOnTagged_negative_ssub_captureOnTagged_castSucc
       rw [h] at this
       contradiction
 
--- TODO: ⚪ Proof this
-theorem captureOnTagged_positive_eq_captureOnTagged_castSucc
-    {n : ℕ}
-    (rule : Positive n)
-  : ((captureOnTagged {rule.val}) |> Instances.castSucc) = captureOnTagged {rule.val.castSucc} := by
-    sorry
+
 
 -- What we can show is that for negative rules, we have a correspondence on the (tagged) capture between the rule and
 -- its positive counterparts, by virtue of the positive rules capturing at least the same instances as the negative

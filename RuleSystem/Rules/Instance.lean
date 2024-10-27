@@ -7,6 +7,8 @@ structure Instance (n : ℕ) where
 
 namespace Instance
 
+def untagged {n : ℕ} : Instance n := ⟨∅⟩
+
 def tagsEmbedding {n : ℕ} : Tags n ↪ Instance n := ⟨Instance.mk, by simp [Function.Injective]⟩
 
 instance fintype {n : ℕ} : Fintype (Instance n) :=
@@ -19,11 +21,14 @@ instance fintype {n : ℕ} : Fintype (Instance n) :=
 
   ⟨elems, complete⟩
 
-theorem eq_iff_tags_eq {n : ℕ} (inst inst' : Instance n) : inst = inst' ↔ inst.tags = inst'.tags := by
+theorem eq_iff_tags_eq {n : ℕ} {inst inst' : Instance n} : inst = inst' ↔ inst.tags = inst'.tags := by
   cases inst; cases inst'; simp
 
+theorem eq_mk_iff_tags_eq {n : ℕ} {tags : Tags n} {inst : Instance n}
+  : inst = ⟨tags⟩ ↔ inst.tags = tags := eq_iff_tags_eq
+
 instance instDecidableEq {n : ℕ} : DecidableEq (Instance n)
-  := λ _ _ ↦ decidable_of_iff' _ (eq_iff_tags_eq _ _)
+  := λ _ _ ↦ decidable_of_iff' _ eq_iff_tags_eq
 
 instance instDecidableTagsNonempty {n : ℕ} (inst : Instance n) : Decidable (inst.tags.Nonempty)
   := Finset.decidableNonempty
