@@ -26,10 +26,11 @@ namespace Rule
 --   * ...
 
 -- TODO: ⚪ Proof this
-theorem captureOnTagged_positive_eq_captureOnTagged_castSucc
+-- TODO: Fix that awkward name
+theorem capture_positive_castSucc_eq_capture_castSucc
     {n : ℕ}
     (rule : Positive n)
-  : ((capture {rule.val}) |> Instances.castSucc) = capture {rule.val.castSucc} := by
+  : (capture {rule.val} |> Instances.castSucc) = capture {rule.val.castSucc} := by
     ext inst
     obtain ⟨tags, rule_val_eq_positive⟩ := Positive.exists_val_eq_positive rule
     simp [capture, Instances.castSucc, Rule.castSucc, applyTo, appliesTo, rule_val_eq_positive]
