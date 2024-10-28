@@ -27,6 +27,10 @@ def fromTagsEmbedding {n : ℕ} : Tags n ↪ Positive n :=
     assumption
   ⟨fromTags, fromTags_inj⟩
 
+def untagged (n : ℕ) : Positive n := fromTags ∅
+
+theorem untagged_val_tags_eq_empty {n : ℕ} : (untagged n).val.tags = ∅ := rfl
+
 def fromTag {n : ℕ} (tag : Tag n) := fromTags {tag}
 
 def fromTagEmbedding {n : ℕ} : Tag n ↪ Positive n :=

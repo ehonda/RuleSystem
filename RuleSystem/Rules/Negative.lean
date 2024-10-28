@@ -26,6 +26,8 @@ def fromTagsEmbedding {n : ℕ} : Tags n ↪ Negative n :=
     assumption
   ⟨fromTags, fromTags_inj⟩
 
+def untagged {n : ℕ} : Negative n := fromTags ∅
+
 def fromTag {n : ℕ} (tag : Tag n) := fromTags {tag}
 
 def fromTagEmbedding {n : ℕ} : Tag n ↪ Negative n :=
