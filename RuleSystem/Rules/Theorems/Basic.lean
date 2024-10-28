@@ -12,25 +12,8 @@ theorem false_of_isPositive_of_isNegative
     | positive => exact h_neg
     | negative => exact h_pos
 
--- TODO: Finish and simplify. HINT: Maybe we need `exists_val_eq_positive` here
-theorem eq_iff_tags_eq {n : ℕ} {rule rule' : Rule n} : rule = rule' ↔ rule.tags = rule'.tags := by
-  constructor
-  · intro rule_eq_rule'
-    cases rule with
-      | positive tags => cases rule' with
-        | positive tags' => simp [rule_eq_rule']
-        | negative tags' => simp [rule_eq_rule']
-      | negative tags => cases rule' with
-        | positive tags' => simp [rule_eq_rule']
-        | negative tags' => simp [rule_eq_rule']
-  · intro rule_tags_eq_rule'_tags
-    cases rule with
-      | positive tags => cases rule' with
-        | positive tags' => sorry
-        | negative tags' => sorry
-      | negative tags => cases rule' with
-        | positive tags' => sorry
-        | negative tags' => sorry
+theorem tags_eq_of_eq {n : ℕ} {rule rule' : Rule n} (h : rule = rule') : rule.tags = rule'.tags := by
+  simp [Rule.tags, h]
 
 namespace Positive
 
@@ -44,17 +27,26 @@ theorem val_eq_positive {n : ℕ} (rule : Positive n) : rule.val = positive rule
   rw [val_eq_positive]
   rfl
 
+theorem eq_iff_tags_eq {n : ℕ} {rule rule' : Positive n} : rule = rule' ↔ rule.val.tags = rule'.val.tags := by
+  constructor
+  · intro rule_eq_rule'
+    simp [Rule.tags, rule_eq_rule']
+  · intro rule_tags_eq_rule'_tags
+    obtain ⟨tags, rule_val_eq_positive⟩ := exists_val_eq_positive rule
+    obtain ⟨tags', rule'_val_eq_positive⟩ := exists_val_eq_positive rule'
+    simp [Rule.tags, rule_val_eq_positive, rule'_val_eq_positive] at rule_tags_eq_rule'_tags
+    apply Subtype.eq_iff.mpr
+    simp [rule_val_eq_positive, rule'_val_eq_positive, rule_tags_eq_rule'_tags]
+
 theorem eq_fromTags_iff_tags_eq
     {n : ℕ}
     {tags : Tags n}
     {rule : Positive n}
   : rule = fromTags tags ↔ rule.val.tags = tags := by
-    -- TODO: Find a better proof
     constructor
     · intro rule_eq_fromTags
-      apply Subtype.eq_iff.mp at rule_eq_fromTags
-      simp [rule_eq_fromTags, fromTags]
-      rfl
+      simp [Rule.tags, rule_eq_fromTags, fromTags]
+    -- TODO: Find a better proof
     · intro rule_val_tags_eq_tags
       apply Subtype.eq_iff.mpr
       simp [rule_val_tags_eq_tags, fromTags]
@@ -94,17 +86,26 @@ theorem val_eq_negative {n : ℕ} (rule : Negative n) : rule.val = negative rule
   rw [val_eq_negative]
   rfl
 
+theorem eq_iff_tags_eq {n : ℕ} {rule rule' : Negative n} : rule = rule' ↔ rule.val.tags = rule'.val.tags := by
+  constructor
+  · intro rule_eq_rule'
+    simp [Rule.tags, rule_eq_rule']
+  · intro rule_tags_eq_rule'_tags
+    obtain ⟨tags, rule_val_eq_negative⟩ := exists_val_eq_negative rule
+    obtain ⟨tags', rule'_val_eq_negative⟩ := exists_val_eq_negative rule'
+    simp [Rule.tags, rule_val_eq_negative, rule'_val_eq_negative] at rule_tags_eq_rule'_tags
+    apply Subtype.eq_iff.mpr
+    simp [rule_val_eq_negative, rule'_val_eq_negative, rule_tags_eq_rule'_tags]
+
 theorem eq_fromTags_iff_tags_eq
     {n : ℕ}
     {tags : Tags n}
     {rule : Negative n}
   : rule = fromTags tags ↔ rule.val.tags = tags := by
-    -- TODO: Find a better proof
     constructor
     · intro rule_eq_fromTags
-      apply Subtype.eq_iff.mp at rule_eq_fromTags
-      simp [rule_eq_fromTags, fromTags]
-      rfl
+      simp [Rule.tags, rule_eq_fromTags, fromTags]
+    -- TODO: Find a better proof
     · intro rule_val_tags_eq_tags
       apply Subtype.eq_iff.mpr
       simp [rule_val_tags_eq_tags, fromTags]
