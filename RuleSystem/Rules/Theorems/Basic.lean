@@ -54,7 +54,6 @@ theorem eq_fromTags_iff_tags_eq
       simp [rule_val_eq_positive] at *
       exact rule_val_tags_eq_tags
 
--- rule_val_ne_untagged : rule ≠ untagged n
 theorem ne_untagged_iff_val_tags_nonempty {n : ℕ} {rule : Positive n}
   : rule ≠ untagged n ↔ rule.val.tags.Nonempty := by
     constructor
