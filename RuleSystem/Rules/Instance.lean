@@ -38,6 +38,26 @@ def castSucc {n : ℕ} (inst : Instance n) : Instance (n + 1) := ⟨inst.tags.ma
 def castSuccEmbedding {n : ℕ} : Instance n ↪ Instance (n + 1) :=
   ⟨castSucc, by simp [Function.Injective, castSucc, eq_iff_tags_eq]⟩
 
+-- TODO: 🕵️‍♀️ Revisit! The whole block about `castPred` is just copied from `TheoremsAboutAlgorithms` and works, but we
+--        should wrap our head around it once more. See:
+--          * https://github.com/ehonda/TheoremsAboutAlgorithms/blob/a8d8a946f0e34dd987996f1f7f209bf61a598a72/TheoremsAboutAlgorithms/Partitions/WithFinset/Cell.lean#L122-L123
+
+def CastPredPrecondition {n : ℕ} (inst : Instance (n + 1)) := ∀ tag ∈ inst.tags, tag ≠ Fin.last _
+
+-- We're using `Subtype.restrict` here. Revisit this to fully understand what's going on here.
+def restrictFinCastPred {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition) (tag : inst.tags) : Fin n
+  := tag.restrict (· ∈ inst.tags) Fin.castPred (h tag tag.property)
+
+theorem restrictFinCastPred_injective {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition)
+  : Function.Injective (restrictFinCastPred inst h) := by
+    intro x y castPred_x_eq_castPred_y
+    simp [restrictFinCastPred] at castPred_x_eq_castPred_y
+    apply Subtype.eq
+    exact Fin.castPred_inj.mp castPred_x_eq_castPred_y
+
+def castPred {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition) : Instance n :=
+  ⟨Finset.univ.map ⟨inst.restrictFinCastPred h, restrictFinCastPred_injective inst h⟩⟩
+
 end Instance
 
 abbrev Instances (n : ℕ) := Finset (Instance n)
