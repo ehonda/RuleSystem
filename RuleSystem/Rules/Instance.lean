@@ -1,7 +1,9 @@
 import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Fintype.Basic
 import RuleSystem.Rules.Defs
+import RuleSystem.Rules.Fin
 
+-- TODO: Instances for `hasMem` so we can just write `Fin.last _ ∈ inst` (instead of `Fin.last _ ∈ inst.tags`).
 structure Instance (n : ℕ) where
   tags : Tags n
 
@@ -38,6 +40,26 @@ def castSucc {n : ℕ} (inst : Instance n) : Instance (n + 1) := ⟨inst.tags.ma
 def castSuccEmbedding {n : ℕ} : Instance n ↪ Instance (n + 1) :=
   ⟨castSucc, by simp [Function.Injective, castSucc, eq_iff_tags_eq]⟩
 
+-- This should be useful fairly often when working with `Instance.castSucc` and `Rule.castSucc`, with regards to their
+-- commutativity. Whether or not instances with `last` are captured should often play a crucial role in proofs.
+--
+-- TODO: ❓ Should we do this or not? Investigate common use cases first.
+-- We make `inst` and `inst'` explicit rather than the `of_`-arguments here, because the common use case should be via
+-- `apply Instance.false_of_last_mem_of_castSuccEmbedding_eq inst inst'` to then generate sub goals for the
+-- `of_`-arguments. Otherwise we would have to resort to the longer and harder to understand
+-- `@Instance.false_of_last_mem_of_castSuccEmbedding_eq _ inst inst' _ _`.
+theorem false_of_last_mem_of_castSuccEmbedding_eq
+    {n : ℕ}
+    {inst : Instance n}
+    {inst' : Instance (n + 1)}
+    (last_mem_inst' : Fin.last _ ∈ inst'.tags)
+    (inst_castSuccEmbedding_eq_inst' : inst' = (inst |> castSuccEmbedding))
+  : False := by
+    simp [inst_castSuccEmbedding_eq_inst', castSuccEmbedding, castSucc] at last_mem_inst'
+    obtain ⟨_, _, _⟩ := last_mem_inst'
+    apply Fin.false_of_castLE_eq_last
+    assumption
+
 -- TODO: 🕵️‍♀️ Revisit! The whole block about `castPred` is just copied from `TheoremsAboutAlgorithms` and works, but we
 --        should wrap our head around it once more. See:
 --          * https://github.com/ehonda/TheoremsAboutAlgorithms/blob/a8d8a946f0e34dd987996f1f7f209bf61a598a72/TheoremsAboutAlgorithms/Partitions/WithFinset/Cell.lean#L122-L123
@@ -65,5 +87,8 @@ abbrev Instances (n : ℕ) := Finset (Instance n)
 namespace Instances
 
 def castSucc {n : ℕ} : Instances n → Instances (n + 1) := Finset.map Instance.castSuccEmbedding
+
+-- TODO: Why can't we write this with the fancy notation?
+def containingLast {n : ℕ} : Instances (n + 1) := Finset.univ.filter (λ inst ↦ Fin.last _ ∈ inst.tags)
 
 end Instances
