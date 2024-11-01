@@ -1,5 +1,7 @@
 import RuleSystem.Rules.Theorems.Advanced
 
+-- TODO: Minimize imports
+
 namespace Rule
 
 namespace Positive
