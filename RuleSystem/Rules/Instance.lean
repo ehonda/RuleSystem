@@ -80,6 +80,30 @@ theorem restrictFinCastPred_injective {n : ℕ} (inst : Instance (n + 1)) (h : i
 def castPred {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition) : Instance n :=
   ⟨Finset.univ.map ⟨inst.restrictFinCastPred h, restrictFinCastPred_injective inst h⟩⟩
 
+theorem castPred_castSucc_eq {n : ℕ} {inst : Instance (n + 1)} (h : inst.CastPredPrecondition)
+  : (inst.castPred h).castSucc = inst := by
+    simp [eq_iff_tags_eq, castSucc, castPred]
+    ext tag
+    constructor
+    · intro tag_mem_castPred_castSucc
+      simp [Fin.castSuccEmb, restrictFinCastPred, Subtype.restrict] at tag_mem_castPred_castSucc
+      obtain ⟨tag', ⟨_, _, _⟩, _⟩ := tag_mem_castPred_castSucc
+      subst tag tag'
+      simpa [Fin.castPred, Fin.castLE]
+    · intro tag_mem_inst_tags
+      simp [Fin.castSuccEmb, restrictFinCastPred, Subtype.restrict]
+      have tag_ne_last : tag ≠ Fin.last _ := h tag tag_mem_inst_tags
+      set tag' := Fin.castPred tag tag_ne_last with tag'_def
+      exists tag'
+      constructor
+      · exists tag
+        exists tag_mem_inst_tags
+      · simp [tag'_def, Fin.castPred, Fin.castLE]
+
+theorem castPred_castSuccEmbedding_eq {n : ℕ} {inst : Instance (n + 1)} (h : inst.CastPredPrecondition)
+  : (inst.castPred h |> castSuccEmbedding) = inst := by
+    simp [castSuccEmbedding, castPred_castSucc_eq]
+
 end Instance
 
 abbrev Instances (n : ℕ) := Finset (Instance n)
