@@ -6,6 +6,14 @@ namespace Rule
 
 namespace Negative
 
+-- TODO: 🔴 Finish this proof
+-- 🔮 (EN-0')
+theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
+    {n : ℕ}
+    (rule : Negative n)
+  : (rule.val.captureFromSingle |> Instances.castSucc) ⊆ rule.val.castSucc.captureFromSingle := by
+    sorry
+
 -- 🔮 (EN-0)
 theorem captureOnTaggedFromSingle_castSucc_subset_castSucc_captureOnTaggedFromSingle
     {n : ℕ}
