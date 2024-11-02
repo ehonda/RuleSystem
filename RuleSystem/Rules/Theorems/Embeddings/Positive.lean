@@ -49,7 +49,7 @@ theorem captureFromSingle_castSucc_ssubset_castSucc_captureFromSingle
 -- 🔮 (EP-3)
 -- Here we explicitly show what's missing from the embedding of the capture of the original rule to the capture of the
 -- embedded rule.
-theorem captureFromSingle_castSucc_eq_castSucc_captureFromSingle_sub_containingLast
+theorem captureFromSingle_castSucc_eq_castSucc_captureFromSingle_sdiff_containingLast
     {n : ℕ}
     {rule : Positive n}
   : (rule.val.captureFromSingle |> Instances.castSucc) = rule.val.castSucc.captureFromSingle \ Instances.containingLast := by

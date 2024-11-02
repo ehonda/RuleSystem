@@ -7,6 +7,7 @@ we don't want to label and track them all if they are more of auxilliary nature)
 * ✅ Proven
 * 🚧 In progress
 * ❓ Open
+* 🚮 Obsolete
 
 The following sections display status by topic. We use kind of a pseudo notation which closely resembles the correct
 lean syntax but is optimized for "informal readability".
@@ -16,7 +17,8 @@ in code which theorems are tracked by this document.
 
 ## Embeddings
 
-Here we denote the `-fromSingle` versions of the capture functions by just their prefix, e.g. `captureFromSingle` by `capture`.
+Here we denote the `-fromSingle` versions of the capture functions by just their prefix, e.g. `captureFromSingle` by
+`capture`.
 
 ### Positive
 
@@ -26,9 +28,9 @@ Here we denote the `-fromSingle` versions of the capture functions by just their
 
 ### Negative
 
-* `(EN-0): rule.captureOnTagged.castSucc ⊆ rule.castSucc.captureOnTagged` ✅
+* `(EN-0): rule.captureOnTagged.castSucc ⊆ rule.castSucc.captureOnTagged` 🚮
 * `(EN-1): rule.captureOnTagged.castSucc ⊂ rule.castSucc.captureOnTagged` ✅
-* `(EN-0') rule.capture.castSucc ⊆ rule.castSucc.capture` 🚧❓
+* `(EN-0') rule.capture.castSucc ⊆ rule.castSucc.capture` ✅
 * `(EN-1') rule.capture.castSucc ⊂ rule.castSucc.capture` ❓
 
 ## Splits

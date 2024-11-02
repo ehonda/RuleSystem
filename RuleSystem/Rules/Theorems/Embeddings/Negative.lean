@@ -12,7 +12,15 @@ theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
     {n : ℕ}
     (rule : Negative n)
   : (rule.val.captureFromSingle |> Instances.castSucc) ⊆ rule.val.castSucc.captureFromSingle := by
-    sorry
+    intro inst inst_mem_capture_castSucc
+    obtain ⟨_, rule_val_eq_negative⟩ := Negative.exists_val_eq_negative rule
+    simp [captureFromSingle, capture, Instances.castSucc, Rule.castSucc, applyTo, appliesTo, rule_val_eq_negative] at *
+    obtain ⟨_, _, _⟩
+      := inst_mem_capture_castSucc
+    subst inst
+    simp [Instance.castSuccEmbedding, Instance.castSucc]
+    apply Finset.inter_eq_empty_iff_inter_map_castSuccEmb_eq_empty.mp
+    assumption
 
 -- 🔮 (EN-0)
 theorem captureOnTaggedFromSingle_castSucc_subset_castSucc_captureOnTaggedFromSingle
