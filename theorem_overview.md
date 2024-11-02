@@ -28,10 +28,15 @@ Here we denote the `-fromSingle` versions of the capture functions by just their
 
 ### Negative
 
-* `(EN-0): rule.captureOnTagged.castSucc ⊆ rule.castSucc.captureOnTagged` 🚮
-* `(EN-1): rule.captureOnTagged.castSucc ⊂ rule.castSucc.captureOnTagged` ✅
-* `(EN-0') rule.capture.castSucc ⊆ rule.castSucc.capture` ✅
-* `(EN-1') rule.capture.castSucc ⊂ rule.castSucc.capture` ❓
+* `(EN-0) rule.capture.castSucc ⊆ rule.castSucc.capture` ✅
+* `(EN-1) rule.capture.castSucc ⊂ rule.castSucc.capture` ✅
+* `(EN-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` ❓
+
+### All
+
+* `(EA-0) rule.capture.castSucc ⊆ rule.castSucc.capture` ❓
+* `(EA-1) rule.capture.castSucc ⊂ rule.castSucc.capture` ❓
+* `(EA-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` ❓
 
 ## Splits
 

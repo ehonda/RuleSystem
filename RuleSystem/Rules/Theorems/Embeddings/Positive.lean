@@ -6,7 +6,7 @@ namespace Rule
 
 namespace Positive
 
--- 🔮 (EP-1)
+-- 🔮 (EP-0)
 -- The naming here follows the (pseudo) dot notation: `rule.capture.castSucc ⊆ rule.castSucc.capture`
 theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
     {n : ℕ}
@@ -19,9 +19,9 @@ theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
     subst inst
     simpa [Instance.castSuccEmbedding, Instance.castSucc]
 
--- 🔮 (EP-2)
+-- 🔮 (EP-1)
 -- Proof idea is as follows: We show that there is an instance captured by the embedded rule that is not captured by
--- embedding the rule captures, if the rule is non-empty. To see why this is true, consider the following example:
+-- embedding the rule captures. To see why this is true, consider the following example:
 --
 --  * `universe = {A, B, C}, rule = positive {B}`
 --  * `inst = ⟨{B, D}⟩`
@@ -46,7 +46,7 @@ theorem captureFromSingle_castSucc_ssubset_castSucc_captureFromSingle
       · simp [inst_def]
       · symm; assumption
 
--- 🔮 (EP-3)
+-- 🔮 (EP-2)
 -- Here we explicitly show what's missing from the embedding of the capture of the original rule to the capture of the
 -- embedded rule.
 theorem captureFromSingle_castSucc_eq_castSucc_captureFromSingle_sdiff_containingLast
