@@ -30,17 +30,20 @@ Here we denote the `-fromSingle` versions of the capture functions by just their
 
 * `(EN-0) rule.capture.castSucc ⊆ rule.castSucc.capture` ✅
 * `(EN-1) rule.capture.castSucc ⊂ rule.castSucc.capture` ✅
-* `(EN-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` ❓
+* `(EN-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` 🚧❓
 
 ### All
 
-* `(EA-0) rule.capture.castSucc ⊆ rule.castSucc.capture` ❓
-* `(EA-1) rule.capture.castSucc ⊂ rule.castSucc.capture` ❓
-* `(EA-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` ❓
+* `(EA-0) rule.capture.castSucc ⊆ rule.castSucc.capture` ✅
+* `(EA-1) rule.capture.castSucc ⊂ rule.castSucc.capture` ✅
+* `(EA-2) rule.capture.castSucc = rule.castSucc.capture \ Instances.containingLast` 🚧❓
 
 ## Splits
 
 TODO: Fill this section
+
+TODO: Interaction with `capture`, e.g. how do `rules.capture` and `rules.split.capture` compare? Can we get one from the
+other?
 
 ## Others
 

@@ -115,4 +115,17 @@ def castSucc {n : ℕ} : Instances n → Instances (n + 1) := Finset.map Instanc
 -- TODO: Why can't we write this with the fancy notation?
 def containingLast {n : ℕ} : Instances (n + 1) := Finset.univ.filter (λ inst ↦ Fin.last _ ∈ inst.tags)
 
+-- TODO: Finish this 🟠
+-- TODO: Naming
+-- TODO: More general version
+theorem inter_eq_empty_iff_inter_map_castSuccEmb_left_eq_empty_of_castPred
+    {n : ℕ}
+    {tags : Tags n}
+    {inst' : Instance n}
+    {inst : Instance (n + 1)}
+    (inst_castPredPrecondition : inst.CastPredPrecondition)
+    (inst'_eq_inst_castPred : inst' = inst.castPred inst_castPredPrecondition)
+  : tags ∩ inst'.tags = ∅ ↔ tags.map Fin.castSuccEmb ∩ inst.tags = ∅ := by
+    sorry
+
 end Instances
