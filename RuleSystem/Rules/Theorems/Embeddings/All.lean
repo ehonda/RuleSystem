@@ -20,6 +20,9 @@ theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
         set rule' : Negative n := ⟨rule, isNegative_of_eq_negative rule_eq⟩
         subst rule
         exact @Negative.captureFromSingle_castSucc_subset_castSucc_captureFromSingle _ rule'
+    -- apply iff_pos_and_neg.mpr
+    -- TODO: Finish this 🟣 via `of_pos_and_neg`
+    -- sorry
 
 -- 🔮 (EA-1)
 theorem captureFromSingle_castSucc_ssubset_castSucc_captureFromSingle

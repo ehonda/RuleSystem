@@ -12,6 +12,24 @@ theorem false_of_isPositive_of_isNegative
     | positive => exact h_neg
     | negative => exact h_pos
 
+-- TODO: Naming
+theorem iff_pos_and_neg
+    {n : ℕ}
+    (h : Rule n → Prop)
+  : (∀ rule : Rule n, h rule) ↔ (∀ rule : Positive n, h rule) ∧ (∀ rule : Negative n, h rule) := by
+    sorry
+
+-- TODO: Naming
+-- TODO: Finish this 🟣
+theorem of_pos_and_neg
+    {n : ℕ}
+    (h : Rule n → Prop)
+    (rule : Rule n)
+    (h_pos : ∀ rule : Positive n, h rule)
+    (h_neg : ∀ rule : Negative n, h rule)
+  : h rule := by
+    sorry
+
 theorem tags_eq_of_eq {n : ℕ} {rule rule' : Rule n} (h : rule = rule') : rule.tags = rule'.tags := by
   simp [Rule.tags, h]
 
