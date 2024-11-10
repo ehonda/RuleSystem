@@ -2,6 +2,7 @@ import Mathlib.Data.Finset.Powerset
 import Mathlib.Data.Fintype.Basic
 import RuleSystem.Rules.Defs
 import RuleSystem.Rules.Fin
+import RuleSystem.Rules.Finset
 
 -- TODO: Instances for `hasMem` so we can just write `Fin.last _ ∈ inst` (instead of `Fin.last _ ∈ inst.tags`).
 structure Instance (n : ℕ) where
@@ -35,10 +36,10 @@ instance instDecidableEq {n : ℕ} : DecidableEq (Instance n)
 instance instDecidableTagsNonempty {n : ℕ} (inst : Instance n) : Decidable (inst.tags.Nonempty)
   := Finset.decidableNonempty
 
-def castSucc {n : ℕ} (inst : Instance n) : Instance (n + 1) := ⟨inst.tags.map Fin.castSuccEmb⟩
+def castSucc {n : ℕ} (inst : Instance n) : Instance (n + 1) := ⟨Finset.castSucc inst.tags⟩
 
 def castSuccEmbedding {n : ℕ} : Instance n ↪ Instance (n + 1) :=
-  ⟨castSucc, by simp [Function.Injective, castSucc, eq_iff_tags_eq]⟩
+  ⟨castSucc, by simp [Function.Injective, castSucc, Finset.castSucc, eq_iff_tags_eq]⟩
 
 -- This should be useful fairly often when working with `Instance.castSucc` and `Rule.castSucc`, with regards to their
 -- commutativity. Whether or not instances with `last` are captured should often play a crucial role in proofs.
@@ -55,7 +56,7 @@ theorem false_of_last_mem_of_castSuccEmbedding_eq
     (last_mem_inst' : Fin.last _ ∈ inst'.tags)
     (inst_castSuccEmbedding_eq_inst' : inst' = (inst |> castSuccEmbedding))
   : False := by
-    simp [inst_castSuccEmbedding_eq_inst', castSuccEmbedding, castSucc] at last_mem_inst'
+    simp [inst_castSuccEmbedding_eq_inst', castSuccEmbedding, castSucc, Finset.castSucc] at last_mem_inst'
     obtain ⟨_, _, _⟩ := last_mem_inst'
     apply Fin.false_of_castLE_eq_last
     assumption
@@ -82,7 +83,7 @@ def castPred {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition)
 
 theorem castPred_castSucc_eq {n : ℕ} {inst : Instance (n + 1)} (h : inst.CastPredPrecondition)
   : (inst.castPred h).castSucc = inst := by
-    simp [eq_iff_tags_eq, castSucc, castPred]
+    simp [eq_iff_tags_eq, castSucc, Finset.castSucc, castPred]
     ext tag
     constructor
     · intro tag_mem_castPred_castSucc
@@ -118,6 +119,13 @@ def containingLast {n : ℕ} : Instances (n + 1) := Finset.univ.filter (λ inst 
 -- TODO: Finish this 🟠
 -- TODO: Naming
 -- TODO: More general version
+--
+-- Compared to
+--
+--    `inter_eq_empty_iff_castSucc_inter_castSucc_eq_empty : s ∩ t = ∅ ↔ s.map Fin.castSuccEmb ∩ t.map Fin.castSuccEmb = ∅`
+--
+-- which, denoting `map castSuccEmb` as `↑` and `map castPredEmb` as `↓`, is `x ∩ y = ∅ ↔ x↑ ∩ y↑ = ∅`, we here have
+-- `x ∩ y↓ = ∅ ↔ x↑ ∩ y = ∅`.
 theorem inter_eq_empty_iff_inter_map_castSuccEmb_left_eq_empty_of_castPred
     {n : ℕ}
     {tags : Tags n}
@@ -126,6 +134,11 @@ theorem inter_eq_empty_iff_inter_map_castSuccEmb_left_eq_empty_of_castPred
     (inst_castPredPrecondition : inst.CastPredPrecondition)
     (inst'_eq_inst_castPred : inst' = inst.castPred inst_castPredPrecondition)
   : tags ∩ inst'.tags = ∅ ↔ tags.map Fin.castSuccEmb ∩ inst.tags = ∅ := by
-    sorry
+    -- TODO: Use 🔮 (OF-0) to prove this
+    constructor
+    · intro tags_inter_inst'_eq_empty
+
+      sorry
+    · sorry
 
 end Instances

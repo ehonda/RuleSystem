@@ -18,7 +18,7 @@ theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
       := inst_mem_capture_castSucc
     subst inst
     simp [Instance.castSuccEmbedding, Instance.castSucc]
-    apply Finset.inter_eq_empty_iff_inter_map_castSuccEmb_eq_empty.mp
+    apply Finset.inter_eq_empty_iff_castSucc_inter_castSucc_eq_empty.mp
     assumption
 
 -- TODO: Adjust text for the proof idea, it's not quite accurate

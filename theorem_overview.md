@@ -47,4 +47,11 @@ other?
 
 ## Others
 
-TODO: Fill this section
+### Finset
+
+In this section we use `s↑` to denote `s.map Fin.castSuccEmb` and `s↓` to denote `s.map Fin.castPredEmb` (Note we don't
+have `Fin.castPredEmb` yet, we use `Finset.restrictCastPredEmb` - which we also don't have, we have
+`Instance.restrictCastPredEmb`).
+
+* `(OF-0) s ∩ t = ∅ ↔ s↑ ∩ t↑ = ∅` ✅
+* `(OF-1) s ∩ t↓ = ∅ ↔ s↑ ∩ t = ∅` 🚧❓

@@ -17,7 +17,7 @@ theorem captureFromSingle_castSucc_subset_castSucc_captureFromSingle
     simp [captureFromSingle, capture, Instances.castSucc, Rule.castSucc, applyTo, appliesTo, rule_val_eq_positive] at *
     obtain ⟨_, _, _⟩ := inst_mem_capture_castSucc
     subst inst
-    simpa [Instance.castSuccEmbedding, Instance.castSucc]
+    simpa [Instance.castSuccEmbedding, Instance.castSucc, Finset.castSucc]
 
 -- 🔮 (EP-1)
 -- Proof idea is as follows: We show that there is an instance captured by the embedded rule that is not captured by
