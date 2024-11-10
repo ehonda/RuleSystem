@@ -52,14 +52,21 @@ theorem castPred_mem_iff_mem_castSucc
       subst x
       assumption
 
--- TODO: Finish this 🟠
 theorem castSucc_mem_iff_mem_castPred
     {n : ℕ}
     {x : Fin n}
     {s : Finset (Fin (n + 1))}
     (s_castPredPrecondition : s.CastPredPrecondition)
   : x.castSucc ∈ s ↔ x ∈ s.castPred s_castPredPrecondition := by
-    sorry
+    simp [castPred] at *
+    constructor
+    · intro x_castSucc_mem
+      exists x.castSucc
+      exists x_castSucc_mem
+    · intro x_mem_map_castPred
+      obtain ⟨_, _, _⟩ := x_mem_map_castPred
+      subst x
+      assumption
 
 -- TODO: There should be an even more general version of this, find and prove it. Can we just use any embedding?
 -- TODO: Naming

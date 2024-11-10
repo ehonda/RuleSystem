@@ -30,15 +30,10 @@ example : @appliesTo 3 (Rule.negative {1}) ⟨{0}⟩ := by
   simp only [appliesTo]
   decide
 
-example : @appliesTo 3 (Rule.negative {1}) ⟨{3, 4}⟩ := by
-  simp only [appliesTo]
-  apply Finset.disjoint_iff_inter_eq_empty.mp
-  simp
-  -- TODO: Find a nice way to solve `¬3 = 1 ∧ ¬4 = 1`
-  sorry
-  -- constructor
-  -- · trivial
-  -- · sorry
+-- example : @appliesTo 3 (Rule.negative {1}) ⟨{3, 4}⟩ := by
+--   simp only [appliesTo]
+--   apply Finset.singleton_inter_of_not_mem
+--   -- TODO: How do we best prove `1 ∉ {3, 4}`?
 
 example : @appliesTo 3 (Rule.positive {0, 2}) ⟨{0, 2, 3}⟩ := by
   simp [appliesTo]
