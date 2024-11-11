@@ -12,23 +12,28 @@ theorem false_of_isPositive_of_isNegative
     | positive => exact h_neg
     | negative => exact h_pos
 
--- TODO: Naming
-theorem iff_pos_and_neg
+theorem of_forall_positive_of_forall_negative
+    {n : ℕ}
+    {rule : Rule n}
+    (h : Rule n → Prop)
+    (h_pos : ∀ rule : Positive n, h rule)
+    (h_neg : ∀ rule : Negative n, h rule)
+  : h rule := match rule_eq : rule with
+    | positive _ => rule_eq ▸ h_pos ⟨rule, isPositive_of_eq_positive rule_eq⟩
+    | negative _ => rule_eq ▸ h_neg ⟨rule, isNegative_of_eq_negative rule_eq⟩
+
+theorem forall_iff_forall_positive_and_forall_negative
     {n : ℕ}
     (h : Rule n → Prop)
   : (∀ rule : Rule n, h rule) ↔ (∀ rule : Positive n, h rule) ∧ (∀ rule : Negative n, h rule) := by
-    sorry
-
--- TODO: Naming
--- TODO: Finish this 🟣
-theorem of_pos_and_neg
-    {n : ℕ}
-    (h : Rule n → Prop)
-    (rule : Rule n)
-    (h_pos : ∀ rule : Positive n, h rule)
-    (h_neg : ∀ rule : Negative n, h rule)
-  : h rule := by
-    sorry
+    constructor
+    · intro forall_h
+      constructor <;> intro rule <;> exact forall_h rule
+    · intro forall_pos_and_neg_h
+      intro rule
+      apply of_forall_positive_of_forall_negative
+      · exact forall_pos_and_neg_h.left
+      · exact forall_pos_and_neg_h.right
 
 theorem tags_eq_of_eq {n : ℕ} {rule rule' : Rule n} (h : rule = rule') : rule.tags = rule'.tags := by
   simp [Rule.tags, h]
