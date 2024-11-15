@@ -24,6 +24,7 @@ instance fintype {n : ℕ} : Fintype (Instance n) :=
 
   ⟨elems, complete⟩
 
+-- TODO: Make ext work with instances @[ext]
 theorem eq_iff_tags_eq {n : ℕ} {inst inst' : Instance n} : inst = inst' ↔ inst.tags = inst'.tags := by
   cases inst; cases inst'; simp
 
@@ -105,6 +106,9 @@ theorem castPred_castSuccEmbedding_eq {n : ℕ} {inst : Instance (n + 1)} (h : i
   : (inst.castPred h |> castSuccEmbedding) = inst := by
     simp [castSuccEmbedding, castPred_castSucc_eq]
 
+abbrev HasCastPredPrecondition (n : ℕ)
+  := Subtype (λ (inst : Instance (n + 1)) ↦ inst.tags.CastPredPrecondition)
+
 end Instance
 
 abbrev Instances (n : ℕ) := Finset (Instance n)
@@ -115,6 +119,26 @@ def castSucc {n : ℕ} : Instances n → Instances (n + 1) := Finset.map Instanc
 
 -- TODO: Why can't we write this with the fancy notation?
 def containingLast {n : ℕ} : Instances (n + 1) := Finset.univ.filter (λ inst ↦ Fin.last _ ∈ inst.tags)
+
+def notContainingLast {n : ℕ} : Instances (n + 1) := Finset.univ.filter (λ inst ↦ Fin.last _ ∉ inst.tags)
+
+theorem val_tags_CastPredPrecondition_of_notContainingLast
+    {n : ℕ}
+    (inst : @notContainingLast n)
+  : inst.val.tags.CastPredPrecondition := by
+    -- TODO: This is a bit awkward, find a cleaner proof
+    simp [Finset.CastPredPrecondition]
+    have := inst.property
+    simp only [notContainingLast, Finset.mem_filter] at this
+    obtain ⟨_, _⟩ := this
+    assumption
+
+instance CoeNotContainingLastHasCastPredPrecondition {n : ℕ}
+  : Coe (@Instances.notContainingLast n) (@Instance.HasCastPredPrecondition n) where
+    coe := by
+      intro inst
+      exists inst
+      apply val_tags_CastPredPrecondition_of_notContainingLast
 
 -- TODO: Naming
 -- TODO: Use the more general version instead
@@ -135,5 +159,66 @@ theorem inter_eq_empty_iff_inter_map_castSuccEmb_left_eq_empty_of_castPred
   : tags ∩ inst'.tags = ∅ ↔ tags.map Fin.castSuccEmb ∩ inst.tags = ∅ := by
     subst inst'
     apply Finset.inter_castPred_eq_empty_iff_castSucc_inter_eq_empty inst_castPredPrecondition
+
+end Instances
+
+------------------------------------------------------------------------------------------------------------------------
+--                                                   ADVANCED                                                         --
+------------------------------------------------------------------------------------------------------------------------
+
+-- TODO: Better structure of this file
+
+namespace Instance
+
+-- TODO: Naming
+-- TODO: Use `insert`
+def insertLast' {n : ℕ} (inst : @Instances.notContainingLast n) : Instance (n + 1)
+  := ⟨inst.val.tags ∪ {Fin.last _}⟩
+
+theorem insertLast'_injective {n : ℕ} : Function.Injective (@insertLast' n) := by
+  intro x y insertLast_x_eq_insertLast_y
+  ext
+  apply eq_iff_tags_eq.mpr
+  ext tag
+  simp [insertLast'] at insertLast_x_eq_insertLast_y
+  constructor
+  -- TODO: Get rid of the symmetric case
+  · intro tag_mem_insertLast_x
+    cases Decidable.eq_or_ne tag (Fin.last _) with
+      | inl tag_eq_last =>
+        have := Instances.val_tags_CastPredPrecondition_of_notContainingLast x tag tag_mem_insertLast_x
+        contradiction
+      | inr tag_ne_last =>
+        have : tag ∈ y.val.tags ∪ {Fin.last _} := by
+          have := Finset.mem_union_left {Fin.last _} tag_mem_insertLast_x
+          rwa [insertLast_x_eq_insertLast_y] at this
+        simp [tag_ne_last] at this
+        assumption
+  · intro tag_mem_insertLast_y
+    cases Decidable.eq_or_ne tag (Fin.last _) with
+      | inl tag_eq_last =>
+        have := Instances.val_tags_CastPredPrecondition_of_notContainingLast y tag tag_mem_insertLast_y
+        contradiction
+      | inr tag_ne_last =>
+        have : tag ∈ x.val.tags ∪ {Fin.last _} := by
+          have := Finset.mem_union_left {Fin.last _} tag_mem_insertLast_y
+          rw [← insertLast_x_eq_insertLast_y] at this
+          assumption
+        simp [tag_ne_last] at this
+        assumption
+
+def insertLast'_embedding {n : ℕ} : @Instances.notContainingLast n ↪ Instance (n + 1) :=
+  ⟨insertLast', insertLast'_injective⟩
+
+end Instance
+
+namespace Instances
+
+def insertLast' {n : ℕ} (insts : Finset (@notContainingLast n)) : Instances (n + 1)
+  := insts.map Instance.insertLast'_embedding
+
+-- TODO: Can we use this definition?
+-- def insertLast' {n : ℕ} (insts : Instance.HasCastPredPrecondition n) : Instances (n + 1)
+--   := insts.map Instance.insertLast'_embedding
 
 end Instances

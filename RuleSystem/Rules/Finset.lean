@@ -34,8 +34,10 @@ def castPred {n : ℕ} (s : Finset (Fin (n + 1))) (h : s.CastPredPrecondition) :
   Finset.univ.map ⟨restrictFinCastPred s h, restrictFinCastPred_injective s h⟩
   -- s.map ⟨restrictFinCastPred s h, restrictFinCastPred_injective s h⟩
 
+abbrev HasCastPredPrecondition (n : ℕ) := Subtype (@CastPredPrecondition n)
+
 -- TODO: Do we want to use this definition? It's certainly nicer to write down
-def castPred' {n : ℕ} (s : Subtype (@CastPredPrecondition n)) := castPred s.val s.property
+def castPred' {n : ℕ} (s : HasCastPredPrecondition n) := castPred s.val s.property
 
 theorem castPred_mem_iff_mem_castSucc
     {n : ℕ}
