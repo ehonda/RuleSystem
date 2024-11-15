@@ -15,7 +15,7 @@ namespace Positive
 theorem ep_3
     {n : ℕ}
     {rule : Positive n}
-  : rule.val.captureEmbed ∪ (Instances.insertLast' rule.val.captureEmbed) = rule.val.embedCapture := by
+  : rule.val.captureEmbed ∪ (rule.val.captureEmbed.map Instance.insertLast'_embedding) = rule.val.embedCapture := by
     sorry
 
 end Positive
