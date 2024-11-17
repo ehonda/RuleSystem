@@ -5,29 +5,22 @@ namespace Instance
 def insertLast {n : ℕ} (inst : Instance (n + 1)) : Instance (n + 1)
   := ⟨inst.tags ∪ {Fin.last _}⟩
 
+-- TODO: Can we use `insertLast` instead?
 def insertLast'' {n : ℕ} (rule : Rule n) (inst : rule.captureEmbed) : Instance (n + 1)
   := ⟨inst.val.tags ∪ {Fin.last _}⟩
 
+-- TODO: Finish proof
 theorem insertLast''_injective {n : ℕ} (rule : Rule n) : Function.Injective (insertLast'' rule) := by
   sorry
 
 def insertLast''Embedding {n : ℕ} (rule : Rule n) : rule.captureEmbed ↪ Instance (n + 1)
   := ⟨insertLast'' rule, insertLast''_injective rule⟩
-
--- -- def Finset.restrict {ι : Type u_2} {π : ι → Type u_3} (s : Finset ι) (f : (i : ι) → π i) (i : { x : ι // x ∈ s }) :
--- -- π ↑i
--- --
--- -- ι =
--- def restrictInsertLast {n : ℕ} (inst : Instance (n + 1)) (h : inst.CastPredPrecondition) : Instance (n + 1)
---   := Finset.restrict (Instances.notContainingLast n) insertLast _
-
 end Instance
 
 namespace Rule
 
--- TODO: Fix this
 def captureEmbedInsertLast {n : ℕ} (rule : Rule n) : Instances (n + 1)
-  := rule.captureEmbed.map (Instance.insertLast''Embedding rule)
+  := rule.captureEmbed.attach.map (Instance.insertLast''Embedding rule)
 
 -- def captureEmbedEmbedding
 
